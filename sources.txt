@@ -1,0 +1,319 @@
+If you're looking to set a size for a phone-like frame (e.g., for mobile devices) in your React app, you can define a specific width and height that resembles the size of a typical phone screen. You can achieve this through CSS.
+
+Here’s how you can create a phone-sized frame for your app, both in terms of dimensions and responsive design:
+
+### Example: Set a Fixed Phone Size (e.g., 375x667px)
+
+This is a common size used for the iPhone 6/7/8 in portrait mode. You can adjust this to match the size of the specific phone you want to simulate.
+
+#### CSS Example
+
+```css
+/* In src/App.css */
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0; /* Optional background color */
+}
+
+.phone-frame {
+  width: 375px;      /* Width of the phone (common for iPhone 6/7/8) */
+  height: 667px;     /* Height of the phone */
+  background-color: #ffffff;  /* Background color of the phone frame */
+  border-radius: 36px; /* Rounded corners for a realistic phone look */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Optional shadow for a realistic effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.phone-content {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+```
+
+### Example: React Component for Phone Frame
+
+```tsx
+// In src/App.tsx
+import React from 'react';
+import './App.css';
+
+const App: React.FC = () => {
+  return (
+    <div className="phone-frame">
+      <div className="phone-content">
+        <h1>Welcome to My Mobile App</h1>
+        <p>This is a phone-sized frame with a realistic look.</p>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+```
+
+### 2. **Setting the Frame Size with Responsive Design**
+
+If you want the phone frame to adjust to different screen sizes (like simulating a mobile device), you can use CSS media queries. This allows the frame to be responsive to various screen sizes.
+
+#### Example: Responsive Phone Frame
+
+```css
+/* In src/App.css */
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+}
+
+.phone-frame {
+  width: 100%;
+  max-width: 375px; /* Max width to simulate mobile devices */
+  height: 100%;
+  max-height: 667px; /* Max height */
+  background-color: #ffffff;
+  border-radius: 36px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Adjust for smaller screens */
+@media (max-width: 375px) {
+  .phone-frame {
+    width: 100%;
+    height: auto;
+  }
+}
+```
+
+### 3. **Using Viewport Units for a More Flexible Approach**
+
+If you'd like to simulate a phone frame based on the viewport size (making it more flexible), you can use `vw` (viewport width) and `vh` (viewport height) units.
+
+#### Example: Flexible Phone Frame Using Viewport Units
+
+```css
+/* In src/App.css */
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+}
+
+.phone-frame {
+  width: 80vw;     /* 80% of the viewport width */
+  height: 140vh;   /* 140% of the viewport height */
+  max-width: 375px; /* Optional max width for larger screens */
+  max-height: 667px; /* Optional max height for larger screens */
+  background-color: #ffffff;
+  border-radius: 36px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+```
+
+This will create a phone-like frame that is responsive and scales depending on the screen size. The `max-width` and `max-height` prevent the frame from becoming too large on very wide screens.
+
+### 4. **Simulation of Different Phones**
+
+If you want to simulate different phones with varying sizes, you can adjust the `width` and `height` of the `.phone-frame` class accordingly. For example:
+
+- **iPhone X**: `width: 375px; height: 812px;`
+- **iPhone 12**: `width: 390px; height: 844px;`
+- **Google Pixel 3**: `width: 360px; height: 740px;`
+
+You can change these values based on the device you want to simulate.
+
+---
+
+### Conclusion
+- **Fixed Size**: Use pixel values like `375px` x `667px` to simulate a phone size.
+- **Responsive Size**: Use `vw`, `vh`, or media queries for a more flexible approach.
+- **Phone Simulation**: Adjust the width and height for different devices (iPhone, Android, etc.).
+
+This allows you to create realistic phone-like frames for your app!
+
+
+
+
+To make the `screenVisibility` state and `handleScreen` function globally accessible in your React application, there are several common patterns, including using **React Context** or **Global State Management** libraries like **Redux**. Below, I'll walk you through how to use **React Context** to share `screenVisibility` and `handleScreen` across your app.
+
+### Step-by-Step Guide to Make the State and Function Accessible Globally Using React Context:
+
+1. **Create a Context**:
+   - You’ll create a `ScreenContext` that will hold the `screenVisibility` state and `handleScreen` function.
+
+2. **Create a Context Provider**:
+   - The `ScreenProvider` will wrap your application and provide access to the context values (`screenVisibility` and `handleScreen`).
+
+3. **Consume Context in Any Component**:
+   - You’ll use the `useContext` hook to access the context values from anywhere in your app.
+
+### Example Code:
+
+#### 1. Create `ScreenContext`:
+
+```tsx
+// src/context/ScreenContext.tsx
+import React, { createContext, useState, useContext, ReactNode } from 'react';
+
+// Define the context type
+interface ScreenVisibility {
+  [key: string]: boolean;
+}
+
+interface ScreenContextType {
+  screenVisibility: ScreenVisibility;
+  handleScreen: (screen: string) => void;
+}
+
+// Create the context with an empty object as the default value
+const ScreenContext = createContext<ScreenContextType | undefined>(undefined);
+
+interface ScreenProviderProps {
+  children: ReactNode;
+}
+
+// Create a provider component to wrap your app
+export const ScreenProvider = ({ children }: ScreenProviderProps) => {
+  const [screenVisibility, setScreenVisibility] = useState<ScreenVisibility>({
+    splash: true,
+    login: false,
+    registration: false,
+  });
+
+  const handleScreen = (screen: string) => {
+    setScreenVisibility((prevState) => {
+      const updatedVisibility: ScreenVisibility = {};
+      for (const key in prevState) {
+        updatedVisibility[key] = false;
+      }
+      updatedVisibility[screen] = true;
+      return updatedVisibility;
+    });
+  };
+
+  return (
+    <ScreenContext.Provider value={{ screenVisibility, handleScreen }}>
+      {children}
+    </ScreenContext.Provider>
+  );
+};
+
+// Create a custom hook to use the context easily
+export const useScreen = () => {
+  const context = useContext(ScreenContext);
+  if (!context) {
+    throw new Error('useScreen must be used within a ScreenProvider');
+  }
+  return context;
+};
+```
+
+#### 2. Wrap Your App with `ScreenProvider`:
+
+```tsx
+// src/App.tsx
+import React from 'react';
+import { ScreenProvider } from './context/ScreenContext';
+import LoginPage from './components/Login/LoginPage';
+import SplashPage from './components/Splash/SplashPage';
+import { StyledFrame } from './styles'; // Your styled component
+
+const App = () => {
+  return (
+    <ScreenProvider>
+      <div className="App">
+        <header className="App-header">
+          {/* Header content */}
+        </header>
+        <StyledFrame>
+          {/* The screens will be conditionally rendered based on visibility */}
+          <SplashPage />
+          <LoginPage />
+        </StyledFrame>
+      </div>
+    </ScreenProvider>
+  );
+};
+
+export default App;
+```
+
+#### 3. Use `screenVisibility` and `handleScreen` in Any Component:
+
+Now, you can use the `useScreen` hook in any component to get the `screenVisibility` and the `handleScreen` function.
+
+```tsx
+// src/components/SomeComponent.tsx
+import React from 'react';
+import { useScreen } from '../context/ScreenContext'; // Import the custom hook
+
+const SomeComponent = () => {
+  const { screenVisibility, handleScreen } = useScreen();
+
+  return (
+    <div>
+      {/* Conditionally render screens based on visibility */}
+      {screenVisibility.splash && <div>Splash Screen Content</div>}
+      {screenVisibility.login && <div>Login Screen Content</div>}
+
+      {/* Button to trigger visibility change */}
+      <button onClick={() => handleScreen('splash')}>Show Splash Screen</button>
+      <button onClick={() => handleScreen('login')}>Show Login Screen</button>
+    </div>
+  );
+};
+
+export default SomeComponent;
+```
+
+### How it Works:
+
+1. **`ScreenProvider`**:
+   - The `ScreenProvider` component wraps your entire app (or the part of it where you need the context) and provides `screenVisibility` and `handleScreen` to all child components.
+
+2. **`useScreen` hook**:
+   - The `useScreen` hook allows any component to access the `screenVisibility` state and the `handleScreen` function without needing to pass them down via props.
+
+3. **Global Access**:
+   - Now, any component wrapped in the `ScreenProvider` can access and modify the visibility of different screens globally.
+
+### Advantages of This Approach:
+- **Global state management**: It allows you to manage and access the visibility state for screens across the entire app.
+- **Scalable**: You can easily add new screens by updating the `screenVisibility` state and the corresponding logic without needing to change the structure of the components that consume this state.
+- **No prop drilling**: You don’t need to pass props from parent components to children; the state is available wherever you need it.
+
+---
+
+### Conclusion:
+
+By using React Context, we can easily manage global state (`screenVisibility`) and functions (`handleScreen`) across the app without prop drilling. This approach is scalable and flexible for handling multiple screens in your app. You can now access the screen visibility state in any component, making your application more maintainable and easier to extend.
+
+
+
