@@ -8,6 +8,7 @@ import MainPage from './components/Main/MainPage';
 import { ScreenVisibilityProvider } from './components/ScreenVisibilityContext';
 import { useScreenVisibility } from './components/ScreenVisibilityContext';
 import Chapter1 from './components/Chapters/Chapter1';
+import Chapter2 from './components/Chapters/Chapter2';
 
 const StyledFrame = styled.div`
   width: 400px;
@@ -27,13 +28,11 @@ function App() {
       <header className="App-header"></header>
 
       <StyledFrame
-        onClick={() => handleScreen('main')}  // Trigger visibility change for login
-        onTouchStart={() => handleScreen('main')}  // Same for touch events
       >
-        {/* Render the Splash page when it's visible */}
         {screenVisibility.splash && <SplashPage />}
-        {/* Render LoginPage based on visibility */}
         {screenVisibility.main && <MainPage />}
+        {screenVisibility.chapter_1 && <Chapter1/>}
+        {screenVisibility.chapter_2 && <Chapter2/>}
 
       </StyledFrame>
     </div>

@@ -20,7 +20,6 @@ export const ScreenVisibilityProvider = ({ children }: { children: ReactNode }) 
     main: false,  // LoginPage is not visible by default
     chapter_1: false,
     chapter_2: false,
-    // Add other screens as needed...
   });
 
   // Function to handle the screen change when a button is clicked

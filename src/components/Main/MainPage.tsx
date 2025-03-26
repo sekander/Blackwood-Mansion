@@ -1,7 +1,6 @@
 // import React from "react";
 import styled from "styled-components";
-import React, { useState } from 'react';
-import Chapter1 from "../Chapters/Chapter1";
+import { useScreenVisibility } from "../ScreenVisibilityContext";
     
 const MainPageLayout = styled.div`
     display: flex;
@@ -22,27 +21,33 @@ const StyledStudyBuddy = styled.span`
 // export const LoginPage = () => {
 export default function MainPage() {
 // State to hold the input value
-    const [inputValue, setInputValue] = useState('');
-    const [currentScreen, setCurrentScreen] = useState<'main' | 'chapter_1'>('main');
+    const { screenVisibility, handleScreen } = useScreenVisibility();  // Get visibility state and handler from context
 
 
   // Handler to switch to Chapter 1
   const goToChapter1 = () => {
-    setCurrentScreen('chapter_1');
+    // setCurrentScreen('chapter_1');
+    handleScreen('chapter_1');
   };
 
 
   return (
     <MainPageLayout>
-
-{currentScreen === 'main' ? (
         <div>
           <StyledStudyBuddy>Main <br />Page</StyledStudyBuddy>
+          <h2>Current Visible Screen: {Object.keys(screenVisibility).find(screen => screenVisibility[screen])}</h2>
+          <button onClick={goToChapter1}>Go to Chapter 1</button>
+        </div>
+
+{/* {currentScreen === 'main' ? (
+        <div>
+          <StyledStudyBuddy>Main <br />Page</StyledStudyBuddy>
+          <h2>Current Visible Screen: {Object.keys(screenVisibility).find(screen => screenVisibility[screen])}</h2>
           <button onClick={goToChapter1}>Go to Chapter 1</button>
         </div>
       ) : (
         <Chapter1 /> // Render Chapter 1 page
-      )}
+      )} */}
     </MainPageLayout>
   );
 };
