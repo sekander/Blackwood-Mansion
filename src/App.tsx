@@ -9,6 +9,7 @@ import { ScreenVisibilityProvider } from './components/ScreenVisibilityContext';
 import { useScreenVisibility } from './components/ScreenVisibilityContext';
 import Chapter1 from './components/Chapters/Chapter1';
 import Chapter2 from './components/Chapters/Chapter2';
+import Chapter3 from './components/Chapters/Chapter3';
 
 const StyledFrame = styled.div`
   width: 400px;
@@ -33,6 +34,7 @@ function App() {
         {screenVisibility.main && <MainPage />}
         {screenVisibility.chapter_1 && <Chapter1/>}
         {screenVisibility.chapter_2 && <Chapter2/>}
+        {screenVisibility.chapter_3 && <Chapter3/>}
 
       </StyledFrame>
     </div>

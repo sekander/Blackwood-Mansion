@@ -1,6 +1,7 @@
 // import React from "react";
 import styled from "styled-components";
 import { useScreenVisibility } from "../ScreenVisibilityContext";
+import { useState } from "react";
     
 const MainPageLayout = styled.div`
     display: flex;
@@ -22,6 +23,13 @@ const StyledStudyBuddy = styled.span`
 export default function MainPage() {
 // State to hold the input value
     const { screenVisibility, handleScreen } = useScreenVisibility();  // Get visibility state and handler from context
+      // State to control if content is visible or not
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Function to toggle the visibility
+  const toggleAccordion = () => {
+    setIsOpen(!isOpen);
+  };
 
 
   // Handler to switch to Chapter 1
@@ -31,23 +39,24 @@ export default function MainPage() {
   };
 
 
+
   return (
     <MainPageLayout>
         <div>
-          <StyledStudyBuddy>Main <br />Page</StyledStudyBuddy>
+          <StyledStudyBuddy>Blackwood <br />Mansion</StyledStudyBuddy>
           <h2>Current Visible Screen: {Object.keys(screenVisibility).find(screen => screenVisibility[screen])}</h2>
-          <button onClick={goToChapter1}>Go to Chapter 1</button>
         </div>
+        <button onClick={toggleAccordion}>
+          {isOpen ? 'Show Less' : 'Show More'}
+        </button>
+        {isOpen && (
+          <p>
+            To play this game, listen to audio files and follow the instructions based on the sounds.
+          </p>
+        )}
 
-{/* {currentScreen === 'main' ? (
-        <div>
-          <StyledStudyBuddy>Main <br />Page</StyledStudyBuddy>
-          <h2>Current Visible Screen: {Object.keys(screenVisibility).find(screen => screenVisibility[screen])}</h2>
-          <button onClick={goToChapter1}>Go to Chapter 1</button>
-        </div>
-      ) : (
-        <Chapter1 /> // Render Chapter 1 page
-      )} */}
+          <button onClick={goToChapter1}>START</button>
+
     </MainPageLayout>
   );
 };

@@ -1,25 +1,10 @@
 import { useScreenVisibility } from '../ScreenVisibilityContext';
 import styled from "styled-components";
 
-
 import { TypeAnimation } from 'react-type-animation';
 
+export default function Chapter3() {
 
-
-const HomeText = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  font-size: 20px;
-  color: rgba(255, 255, 255, 0.9); /* Slightly transparent white text */
-  font-weight: bold;
-
-`;
-
-
-
-export default function Chapter1() {
 // State to manage which screen is visible
   const { screenVisibility, handleScreen } = useScreenVisibility();
   // Handler to go back to MainPage
@@ -35,14 +20,13 @@ export default function Chapter1() {
     <div>
         <div>
 
-          <h1>Welcome to Chapter 1!</h1>
-
-            <TypeAnimation 
+          <h1>Welcome to Chapter 3!</h1>
+          <TypeAnimation 
               sequence={[
-                  "It was a dark, stormy evening when the call came in. A nervous voice on the other end, trembling with something deeper than fear. The caretaker of Blackwood Mansion desperate for help. The house, passed down through generations, held more than memories. It held shadows. Secrets buried beneath its foundations. And now... something had begun to stir.", 1000,
+                "The detective’s hand hovered over the cursed journal, but the sudden sound of footsteps froze him. Hooded cloaked figures emerged from the shadows with glowing eyes."
               ]}
               speed={50}
-              // repeat={Infinity}
+            //   repeat={Infinity}
             />
 
           <h2>Current Visible Screen: {Object.keys(screenVisibility).find(screen => screenVisibility[screen])}</h2>
