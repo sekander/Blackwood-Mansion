@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 import styled from "styled-components";
 import { useScreenVisibility } from '../ScreenVisibilityContext';
 
+
 const StyledStudyBuddy = styled.span`
   color: black;
   font-size: 48px;

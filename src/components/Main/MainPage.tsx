@@ -18,6 +18,23 @@ const StyledStudyBuddy = styled.span`
   word-wrap: break-word;
 `;
 
+
+
+const StyledRectangle3 = styled.div`
+  width: 574px;
+  height: 100px;
+  background: #D9D9D9;
+`;
+
+const StyledRectangle1 = styled.div`
+  width: 388px;
+  height: 372px;
+  background: #701919;
+  border-radius: 112px;
+`;
+
+
+
 // export const LoginPage = () => {
 export default function MainPage() {
 // State to hold the input value
@@ -33,11 +50,17 @@ export default function MainPage() {
 
   return (
     <MainPageLayout>
-        <div>
+        
+        <StyledRectangle1>
+
           <StyledStudyBuddy>Main <br />Page</StyledStudyBuddy>
           <h2>Current Visible Screen: {Object.keys(screenVisibility).find(screen => screenVisibility[screen])}</h2>
           <button onClick={goToChapter1}>Go to Chapter 1</button>
-        </div>
+        
+        <StyledRectangle1 />
+        </StyledRectangle1>
+
+
 
 {/* {currentScreen === 'main' ? (
         <div>
