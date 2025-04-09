@@ -67,11 +67,51 @@ export default function Chapter1() {
     }
   };
 
+  const currentArray : number[] = []
+
   const handleTempArr = (card: Card) => {
-    console.log("HandleTempArr")
-    console.log(card)
-    
+    if(currentArray.length < cardData.length ){
+      console.log("HandleTempArr")
+      console.log(card.id)
+  
+      if(!currentArray.includes(card.id)) {
+        currentArray.push(card.id)
+        console.log(currentArray)
+      } else {
+        console.log(`card ${card.id} is already in the array` )
+      }
+    }
   };
+
+
+  const checkOrder = (array: number[]) => {
+    const correctOrder = [2, 5, 3, 1, 4];
+    
+    let correctOder: Boolean = true;
+
+    for (let index = 0; index < array.length; index++) {
+      const element = array[index];
+      if( element == correctOrder[index]){
+        correctOder = true;
+      } else {
+        correctOder = false;
+      }
+    }
+    
+    if(correctOder) {
+      alert(`order is correct`)
+    } else {
+      alert("order is not correct")
+    }
+    // array.forEach((num: number) => {
+    //   if(array[num] === correctOrder[num]){
+    //     console.log("correct")
+    //   } else {
+    //     console.log("non-correct")
+    //   }
+    // }
+    // )
+  }
 
   const getCardNumber = (cardId: number) => {
     const index = clickOrder.indexOf(cardId);
@@ -116,8 +156,9 @@ export default function Chapter1() {
       <div className="chapter-controls">
         <button onClick={goBackToMain}>Back to Main</button>
         <button 
-          onClick={goToChapter2} 
-          disabled={!isOrderCorrect() || clickOrder.length !== cardData.length}
+          // onClick={goToChapter2} 
+          onClick={() => checkOrder(currentArray)} 
+          // disabled={!isOrderCorrect() || clickOrder.length !== cardData.length}
         >
           Continue to Chapter 2
         </button>
