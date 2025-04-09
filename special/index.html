@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackwood Mansion | Haunted Audio Experience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0a0a0a;
+            --primary-light: #e8e8e8;
+            --accent-red: #8b0000;
+            --accent-gold: #d4af37;
+            --text-shadow: 0 0 8px rgba(139, 0, 0, 0.7);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'EB Garamond', serif;
+            background-color: var(--primary-dark);
+            color: var(--primary-light);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 20%),
+                url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.85);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--accent-red);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 4rem;
+            color: var(--accent-gold);
+            text-shadow: var(--text-shadow);
+            margin-bottom: 1rem;
+            letter-spacing: 0.2rem;
+            position: relative;
+            animation: flicker 8s infinite alternate;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            font-style: italic;
+            letter-spacing: 0.1rem;
+            color: var(--primary-light);
+            text-shadow: 0 0 5px rgba(139, 0, 0, 0.5);
+        }
+        
+        .mansion-description {
+            background: rgba(10, 10, 10, 0.7);
+            padding: 2rem;
+            border-radius: 5px;
+            border-left: 3px solid var(--accent-red);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 3rem;
+            line-height: 1.8;
+        }
+        
+        .mansion-description p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .audio-section {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 2.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--accent-gold);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .audio-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+        
+        .audio-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2rem;
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+            text-shadow: var(--text-shadow);
+        }
+        
+        .audio-description {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .audio-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .audio-btn {
+            background: transparent;
+            color: var(--primary-light);
+            border: 1px solid var(--accent-red);
+            padding: 1rem 2rem;
+            font-family: 'EB Garamond', serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            min-width: 150px;
+        }
+        
+        .audio-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 0, 0, 0.5), transparent);
+            transition: all 0.6s ease;
+            z-index: -1;
+        }
+        
+        .audio-btn:hover {
+            color: var(--accent-gold);
+            border-color: var(--accent-gold);
+            transform: translateY(-3px);
+        }
+        
+        .audio-btn:hover::before {
+            left: 100%;
+        }
+        
+        .audio-visualizer {
+            height: 100px;
+            width: 100%;
+            margin: 2rem auto;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .visualizer-bar {
+            background: linear-gradient(to top, var(--accent-red), var(--accent-gold));
+            width: 8px;
+            min-height: 5px;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.2s ease-out;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2rem 0;
+            border-top: 1px solid var(--accent-red);
+            font-size: 0.9rem;
+            color: rgba(232, 232, 232, 0.7);
+        }
+        
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow: 
+                    0 0 8px var(--accent-red),
+                    0 0 16px var(--accent-red),
+                    0 0 24px var(--accent-red);
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+            }
+        }
+        
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .audio-controls {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .audio-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BLACKWOOD MANSION</h1>
+            <p class="subtitle">An Auditory Journey Into the Unknown</p>
+        </header>
+        
+        <div class="mansion-description">
+            <p>Blackwood Mansion stands silent in the moonlit clearing, its boarded windows hiding secrets no living soul remembers. The air grows thick as you approach the grand oak door, your fingers brushing against the tarnished brass handle.</p>
+            
+            <p>Tonight, through sound alone, you will experience what few have survived. The creak of floorboards where no one walks. The distant piano playing a forgotten sonata. The whispers in the walls that seem to call your name.</p>
+            
+            <p>Prepare yourself. Once you begin this auditory journey, there may be no turning back. The mansion remembers every visitor, and it has been so very long since it last had guests...</p>
+        </div>
+        
+        <div class="audio-section">
+            <h2 class="audio-title">The Sounds of Blackwood</h2>
+            <p class="audio-description">Engage with the haunted audio experience below. We recommend using headphones for full immersion.</p>
+            
+            <div class="audio-visualizer" id="visualizer">
+                <!-- Visualizer bars will be generated by JavaScript -->
+            </div>
+            
+            <audio id="mansion-audio" src="audio/gangbusters.mp3" loop></audio>
+            
+            <div class="audio-controls">
+                <button id="play-btn" class="audio-btn">Begin Experience</button>
+                <button id="stop-btn" class="audio-btn">End Experience</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Blackwood Estate Preservation Society. All rights reserved.</p>
+            <p>Those who listen do so at their own peril.</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Audio elements
+        const audio = document.getElementById('mansion-audio');
+        const playBtn = document.getElementById('play-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const visualizer = document.getElementById('visualizer');
+        
+        // Create audio context for visualizer
+        let audioContext;
+        let analyser;
+        let dataArray;
+        let source;
+        let isPlaying = false;
+        let animationId;
+        
+        // Create visualizer bars
+        for (let i = 0; i < 30; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'visualizer-bar';
+            bar.style.height = `${Math.random() * 30 + 5}px`;
+            visualizer.appendChild(bar);
+        }
+        const bars = document.querySelectorAll('.visualizer-bar');
+        
+        // Initialize audio context on first interaction
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 64;
+                
+                source = audioContext.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioContext.destination);
+                
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            }
+        }
+        
+        // Visualizer animation
+        function updateVisualizer() {
+            if (!isPlaying) return;
+            
+            analyser.getByteFrequencyData(dataArray);
+            
+            bars.forEach((bar, i) => {
+                const index = Math.floor(i * (dataArray.length / bars.length));
+                const height = dataArray[index] / 2;
+                bar.style.height = `${height > 5 ? height : 5}px`;
+                bar.style.opacity = height > 10 ? '1' : '0.7';
+            });
+            
+            animationId = requestAnimationFrame(updateVisualizer);
+        }
+        
+        // Play button handler
+        playBtn.addEventListener('click', () => {
+            if (!isPlaying) {
+                initAudio();
+                audio.play();
+                isPlaying = true;
+                playBtn.textContent = 'Playing...';
+                stopBtn.textContent = 'End Experience';
+                updateVisualizer();
+                
+                // Resume audio context if it was suspended
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+            }
+        });
+        
+        // Stop button handler
+        stopBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                audio.currentTime = 0;
+                isPlaying = false;
+                playBtn.textContent = 'Begin Experience';
+                cancelAnimationFrame(animationId);
+                
+                // Reset visualizer bars
+                bars.forEach(bar => {
+                    bar.style.height = `${Math.random() * 30 + 5}px`;
+                    bar.style.opacity = '0.7';
+                });
+            }
+        });
+        
+        // Handle audio ending
+        audio.addEventListener('ended', () => {
+            isPlaying = false;
+            playBtn.textContent = 'Begin Experience';
+            cancelAnimationFrame(animationId);
+        });
+        
+        // Random flickering effect for atmosphere
+        setInterval(() => {
+            if (Math.random() > 0.8) {
+                document.body.style.backgroundImage = `
+                    radial-gradient(circle at ${Math.random() * 100}% ${Math.random() * 100}%, rgba(139, 0, 0, 0.3) 0%, transparent 20%),
+                    radial-gradient(circle at ${Math.random() * 100}% ${Math.random() * 100}%, rgba(139, 0, 0, 0.3) 0%, transparent 20%),
+                    url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop')
+                `;
+                
+                setTimeout(() => {
+                    document.body.style.backgroundImage = `
+                        radial-gradient(circle at 10% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 20%),
+                        radial-gradient(circle at 90% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 20%),
+                        url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop')
+                    `;
+                }, 200);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
