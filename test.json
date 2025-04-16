@@ -1,0 +1,53 @@
+{
+  "chapter1": {
+    "sfx1": {
+      "id": 1,
+      "soundEffect": "/asset/audio/bones-scream.pm3",
+      "image": "public/bloody_knife.png"
+    },
+    "sfx2": {
+  
+    },
+    "sfx3": {
+  
+    },
+    "sfx4": {
+  
+    },
+    "sfx5": {
+  
+    },
+    "sfx6": {
+  
+    },
+    "sfx7": {
+  
+    },
+    "sfx8": {
+  
+    },
+    "sfx9": {
+  
+    }
+  }
+
+}
+
+
+card1 = {
+  "id": 1,
+  "chapter": 1,
+  "description" : "Car driving on gravel"
+}
+
+card2 = {
+  "id": 2,
+  "chapter": 1,
+  "description" : "Car driving on gravel"
+}
+
+card2 = {
+  "id": 2,
+  "chapter": 1,
+  "description" : "Car driving on gravel"
+}
