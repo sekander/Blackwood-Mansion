@@ -1,18 +1,77 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { useCardContext } from '../CardContext'; // Adjust path as needed
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useScreenVisibility } from '../ScreenVisibilityContext';
 import { TypeAnimation } from 'react-type-animation';
-import { Html5Qrcode } from 'html5-qrcode';
+import Modal from 'react-modal';
+import { Html5QrcodeScanner } from 'html5-qrcode'; // Import the QR code scanner
+import { useScreenVisibility } from '../ScreenVisibilityContext';
 import Carousel from 'react-spring-3d-carousel';
 import { config } from 'react-spring';
+import { useCardContext } from '../CardContext';
+
+
+// import { useCardContext } from '../CardContext';
+// Set Modal app element for accessibility
+Modal.setAppElement('#root');
 
 const CardContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr; 
+  grid-template-columns: 1fr 1fr;
 `;
 
+// Define types for QR Reader props
+interface QrReaderProps {
+  delay: number;
+  style: CSSProperties;
+  onError: (err: any) => void;
+  onScan: (data: string | null) => void;
+}
+
+// Create the QrReader component
+const QrReader: React.FC<QrReaderProps> = ({ delay, style, onError, onScan }) => {
+  const qrScannerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (qrScannerRef.current) {
+      // Initialize the Html5QrcodeScanner with the ID of the element
+      const qrCodeScanner = new Html5QrcodeScanner(
+        "qr-reader", // Pass the ID of the div element
+        {
+          fps: 10, // Frames per second, control the scan speed
+          qrbox: 250, // Size of the scanning box
+        },
+        false
+      );
+
+      // Start the QR scanner
+      qrCodeScanner.render(
+        (decodedText: string) => {
+          onScan(decodedText); // Handle successful scan
+        },
+        (error: string) => {
+          onError(error); // Handle error
+        }
+      );
+
+      // Clean up the QR scanner when the component unmounts
+      return () => {
+        qrCodeScanner.clear();
+      };
+    }
+  }, [onScan, onError]);
+
+  return (
+    <div style={style}>
+      {/* Add the id to the div */}
+      <div ref={qrScannerRef} id="qr-reader" style={{ width: '100%', height: '100%' }}></div>
+    </div>
+  );
+};
+
 const Chapter1: React.FC = () => {
+  const [showModal, setShowModal] = useState(false); // Modal visibility state
+  const [scanData, setScanData] = useState<string>('Not Found'); // State to store scan results
+  const [jsonData, setJsonData] = useState<any>(null); // State to store the JSON response
+
   const { screenVisibility, handleScreen } = useScreenVisibility();
   const {
     cardData,
@@ -22,23 +81,30 @@ const Chapter1: React.FC = () => {
     currentArray,
   } = useCardContext();
 
-  // Change the type of goToSlide to `number | undefined`
-  const [goToSlide, setGoToSlide] = useState<number | undefined>(undefined); // Changed from `number | null`
+  const [goToSlide, setGoToSlide] = useState<number | undefined>(undefined);
 
-  const [showScanner, setShowScanner] = useState(false);
-  const qrRef = useRef<Html5Qrcode | null>(null);
 
-  const currentCard = goToSlide !== undefined ? cardData[goToSlide] : null; // Changed `null` to `undefined`
+  // Open and close modal functions
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
+
 
   const goBackToMain = () => handleScreen('main');
   const goToChapter2 = () => handleScreen('chapter_2');
 
   const handleCardClick = (cardIndex: number) => {
     handleTempArr(cardData[cardIndex]);
-    setShowScanner(true);
+    setShowModal(true);
   };
-
-  const carouselSlides = cardData.map((card, index) => ({
+  // Placeholder images array
+  const placeholderImages = [
+    { id: 1, name: 'Placeholder 1', image: '/path/to/placeholder1.png' },
+    { id: 2, name: 'Placeholder 2', image: '/path/to/placeholder2.png' },
+    { id: 3, name: 'Placeholder 3', image: '/path/to/placeholder3.png' },
+    { id: 4, name: 'Placeholder 4', image: '/path/to/placeholder4.png' },
+  ];
+  // const carouselSlides = cardData.map((card, index) => ({
+  const carouselSlides = placeholderImages.map((card, index) => ({
     key: index,
     content: (
       <div
@@ -58,45 +124,127 @@ const Chapter1: React.FC = () => {
     onClick: () => setGoToSlide(index),
   }));
 
-  useEffect(() => {
-    if (showScanner && currentCard) {
-      const scannerId = "qr-reader";
-      const qrCodeScanner = new Html5Qrcode(scannerId);
-      qrRef.current = qrCodeScanner;
-
-      qrCodeScanner
-        .start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: 250 },
-          (decodedText) => {
-            console.log("✅ QR Code scanned:", decodedText);
-            alert(`QR Code: ${decodedText}`);
-            qrCodeScanner.stop().then(() => setShowScanner(false));
-          },
-          () => {}
-        )
-        .catch((err) => {
-          console.error("Failed to start QR scanner", err);
-        });
-    }
-
-    return () => {
-      if (qrRef.current?.isScanning) {
-        qrRef.current.stop().then(() => qrRef.current?.clear());
-      }
-    };
-  }, [showScanner, currentCard]);
-
   return (
     <div>
       <h1>Welcome to Chapter 1!</h1>
-      <TypeAnimation 
+      <TypeAnimation
         sequence={[
-          "It was a dark, stormy evening when the call came in. A nervous voice on the other end, trembling with something deeper than fear. The caretaker of Blackwood Mansion desperate for help. The house, passed down through generations, held more than memories. It held shadows. Secrets buried beneath its foundations. And now... something had begun to stir.", 
+          "It was a dark, stormy evening when the call came in. A nervous voice on the other end, trembling with something deeper than fear. The caretaker of Blackwood Mansion desperate for help. The house, passed down through generations, held more than memories. It held shadows. Secrets buried beneath its foundations. And now... something had begun to stir.",
           1000,
         ]}
         speed={50}
       />
+
+      {/* Button to trigger the modal */}
+      <button
+        onClick={openModal}
+        className="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+      >
+        Open QR Code Modal
+      </button>
+
+      {/* Modal Component */}
+      <Modal
+        isOpen={showModal}
+        onRequestClose={closeModal}
+        contentLabel="QR Code Modal"
+        className="modal-content"
+        overlayClassName="modal-overlay"
+        closeTimeoutMS={200} // Smooth fade-out
+      >
+        <div className="modal-header">
+          <h2 className="modal-title">🪟 QR Code Scanner</h2>
+          <button onClick={closeModal} className="close-btn">
+            ✕
+          </button>
+        </div>
+        <div className="modal-body">
+          <div id="qr-reader" style={{ width: '300px', height: '300px' }}>
+            {/* QR Reader Component */}
+            <QrReader
+              delay={300}
+              style={{ width: '100%' }}
+              onError={(err) => console.error('QR scan error', err)} // Error handling
+              onScan={async (data: string | null) => {
+                if (data) {
+                  setScanData(data); // Save scanned data
+                  console.log('Scanned data:', data);
+              
+                  try {
+                    const response = await fetch(data);
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+              
+                    const json = await response.json();
+                    setJsonData(json); // Set JSON result
+                  } catch (error) {
+                    console.error('Fetch error:', error);
+                    setJsonData({ error: 'Failed to fetch data.' });
+                  }
+                }
+              }}
+            />
+          </div>
+
+          <p>Scanned Data: {scanData}</p> {/* Display scanned data */}
+
+
+          {/* Display the fetched JSON data */}
+          {jsonData ? (
+            <div>
+              <h3>Fetched Data:</h3>
+              <pre>{JSON.stringify(jsonData, null, 2)}</pre>
+                {jsonData && Array.isArray(jsonData) ? (
+                <div>
+                  <h3>Fetched Data:</h3>
+                  <pre>{JSON.stringify(jsonData, null, 2)}</pre>
+                  {/* {jsonData.map((item: any) => (
+                  <div key={item.id}>
+                    <p>ID: {item.id}</p>
+                    <p>Name: {item.name}</p>
+                    <p>Image: {item.image}</p>
+                  </div> */}
+                  {jsonData.map((item: any, index: number) => {
+                    <div key={item.id}>
+                      <p>ID: {item.id}</p>
+                      <p>Name: {item.name}</p>
+                      <p>Image: {item.image}</p>
+                    </div> 
+                    const matchingCard = cardData.find((card) => card.id === item.id);
+                    if (matchingCard) {
+                    placeholderImages[index].name = matchingCard.name;
+                    placeholderImages[index].id = matchingCard.id;
+                    placeholderImages[index].image = matchingCard.image;
+                    }
+                    return (
+                    <div key={item.id}>
+                      <p>ID: {item.id}</p>
+                      <p>Name: {item.name}</p>
+                      <p>Image: {item.image}</p>
+                      {matchingCard && (
+                      <>
+                        <p>Updated Placeholder Name: {matchingCard.name}</p>
+                        <p>Updated Placeholder ID: {matchingCard.id}</p>
+                        <p>Updated Placeholder Image: {matchingCard.image}</p>
+                      </>
+                      )}
+                    </div>
+                    );
+                  })}
+                </div>
+                ) : (
+                <p>No valid data fetched yet.</p>
+                )}
+            </div>
+          ) : (
+            <p>No data fetched yet.</p>
+          )}
+
+        </div>
+      </Modal>
+
+
 
       <div style={{ width: '500px', height: '400px', margin: '40px auto' }}>
         <Carousel
@@ -123,28 +271,8 @@ const Chapter1: React.FC = () => {
       <button onClick={goBackToMain}>Back to Main</button>
       <button onClick={goToChapter2}>Go to Chapter 2</button>
 
-      {showScanner && (
-        <div className="fixed top-0 left-0 w-full h-full z-50 bg-black bg-opacity-80 flex justify-center items-center">
-          <div className="bg-white p-4 rounded-lg">
-            <div id="qr-reader" style={{ width: '300px' }}></div>
-            <button
-              onClick={() => {
-                if (qrRef.current?.isScanning) {
-                  qrRef.current.stop().then(() => {
-                    qrRef.current?.clear();
-                    setShowScanner(false);
-                  });
-                } else {
-                  setShowScanner(false);
-                }
-              }}
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-            >
-              Close Scanner
-            </button>
-          </div>
-        </div>
-      )}
+
+
     </div>
   );
 };

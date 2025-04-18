@@ -2,10 +2,9 @@ import React, { createContext, useContext, useState } from 'react';
 
 export interface Card {
   id: number;
-  image: string;
   name: string;
+  image: string;
   audio: string;
-  qrcode: string;
 }
 
 type CardSetType = 'set1' | 'set2' | 'set3';
@@ -30,27 +29,35 @@ export const useCardContext = (): CardContextProps => {
 };
 
 const cardSet1: Card[] = [
-  { id: 1, image: '/fall_object.webp', name: 'Fallen Object', audio: '../../asset/audio/bones-scream.mp3', qrcode: '' },
-  { id: 2, image: '/whisper_image.webp', name: 'Suspicious Whispers', audio: '../../asset/audio/fart.mp3', qrcode: '' },
-  { id: 3, image: '/bloody_knife.png', name: 'Bloody Knife', audio: '../../asset/audio/fart.mp3', qrcode: '' },
-  { id: 4, image: '/torn_curtain.png', name: 'Torn Curtain', audio: '../../asset/audio/fart.mp3', qrcode: '' },
-  { id: 5, image: '/locked_diary.png', name: 'Locked Diary', audio: '../../asset/audio/fart.mp3', qrcode: '' },
+  { id: 1, name: 'Fallen Object', image: '/projects/blackwood-mansion/assets/images/fall_object.webp',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_1_SFX_1_mixdown.mp3'},
+  { id: 2, name: 'Suspicious Whispers', image: '/projects/blackwood-mansion/assets/images/whisper_image.webp',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_1_SFX_2_mixdown.mp3'},
+  { id: 3, name: 'Bloody Knife', image: '/projects/blackwood-mansion/assets/images/bloody_knife.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_1_SFX_3_mixdown.mp3'},
+  { id: 4, name: 'Torn Curtain', image: '/projects/blackwood-mansion/assets/images/torn_curtain.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_1_SFX_4_mixdown.mp3'},
+  { id: 5, name: 'Locked Diary', image: '/projects/blackwood-mansion/assets/images/locked_diary.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_1_SFX_5_mixdown.mp3'},
+  { id: 6, name: 'Locked Diary', image: '/projects/blackwood-mansion/assets/images/locked_diary.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_1_SFX_6_mixdown.mp3'},
+  { id: 7, name: 'Locked Diary', image: '/projects/blackwood-mansion/assets/images/locked_diary.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_1_SFX_7_mixdown.mp3'},
+  { id: 8, name: 'Locked Diary', image: '/projects/blackwood-mansion/assets/images/locked_diary.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_1_SFX_8_mixdown.mp3'},
+  { id: 9, name: 'Locked Diary', image: '/projects/blackwood-mansion/assets/images/locked_diary.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_1_SFX_9_mixdown.mp3'},
 ];
 
 const cardSet2: Card[] = [
-  { id: 6, image: '/ghost.png', name: 'Ghost', audio: '../../asset/audio/ghost.mp3', qrcode: '' },
-  { id: 7, image: '/mirror.png', name: 'Broken Mirror', audio: '../../asset/audio/glass.mp3', qrcode: '' },
-  { id: 8, image: '/shadow.png', name: 'Creepy Shadow', audio: '../../asset/audio/shadow.mp3', qrcode: '' },
-  { id: 9, image: '/clown.png', name: 'Scary Clown', audio: '../../asset/audio/clown.mp3', qrcode: '' },
-  { id: 10, image: '/doll.png', name: 'Haunted Doll', audio: '../../asset/audio/doll.mp3', qrcode: '' },
+  { id: 10, name: 'Ghost', image: '/projects/blackwood-mansion/assets/images/ghost.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_2_SFX_1_mixdown.mp3'},
+  { id: 11, name: 'Broken Mirror', image: '/projects/blackwood-mansion/assets/images/mirror.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_2_SFX_2_mixdown.mp3'},
+  { id: 12, name: 'Creepy Shadow', image: '/projects/blackwood-mansion/assets/images/shadow.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_2_SFX_3_mixdown.mp3'},
+  { id: 13, name: 'Scary Clown', image: '/projects/blackwood-mansion/assets/images/clown.png', audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_2_SFX_4_mixdown.mp3'},
+  { id: 14, name: 'Haunted Doll', image:'/projects/blackwood-mansion/assets/images/doll.png', audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_2_SFX_5_mixdown.mp3'},
+  { id: 15, name: 'Haunted Doll', image:'/projects/blackwood-mansion/assets/images/doll.png', audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_2_SFX_6_mixdown.mp3'},
 ];
 
 const cardSet3: Card[] = [
-  { id: 11, image: '/grave.png', name: 'Graveyard', audio: '../../asset/audio/grave.mp3', qrcode: '' },
-  { id: 12, image: '/bat.png', name: 'Flying Bat', audio: '../../asset/audio/bat.mp3', qrcode: '' },
-  { id: 13, image: '/zombie.png', name: 'Zombie', audio: '../../asset/audio/zombie.mp3', qrcode: '' },
-  { id: 14, image: '/fog.png', name: 'Thick Fog', audio: '../../asset/audio/fog.mp3', qrcode: '' },
-  { id: 15, image: '/clock.png', name: 'Broken Clock', audio: '../../asset/audio/clock.mp3', qrcode: '' },
+  { id: 16, name: 'Graveyard', image: '/projects/blackwood-mansion/assets/images/grave.png', audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_3_SFX_1_mixdown.mp3'},
+  { id: 17, name: 'Flying Bat', image: '/projects/blackwood-mansion/assets/images/bat.png', audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_3_SFX_2_mixdown.mp3'},
+  { id: 18, name: 'Zombie', image: '/projects/blackwood-mansion/assets/images/zombie.png', audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_3_SFX_3_mixdown.mp3'},
+  { id: 19, name: 'Thick Fog', image: '/projects/blackwood-mansion/assets/images/fog.png', audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_3_SFX_4_mixdown.mp3'},
+  { id: 20, name: 'Broken Clock',image: '/projects/blackwood-mansion/assets/images/clock.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_3_SFX_5_mixdown.mp3'},
+  { id: 21, name: 'Broken Clock',image: '/projects/blackwood-mansion/assets/images/clock.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_3_SFX_6_mixdown.mp3'},
+  { id: 22, name: 'Broken Clock',image: '/projects/blackwood-mansion/assets/images/clock.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_3_SFX_7_mixdown.mp3'},
+  { id: 23, name: 'Broken Clock',image: '/projects/blackwood-mansion/assets/images/clock.png',  audio: '/projects/blackwood-mansion/assets/audio/CHAPTER_3_SFX_8_mixdown.mp3'},
 ];
 
 const getCardSet = (type: CardSetType): Card[] => {
@@ -89,9 +96,9 @@ export const CardProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkOrder = (array: number[]) => {
     const orders: Record<CardSetType, number[]> = {
-      set1: [2, 5, 3, 1, 4],
-      set2: [6, 10, 7, 8, 9],
-      set3: [12, 15, 11, 13, 14],
+      set1: [2, 5, 3, 1, 4, 6, 7, 8, 9],
+      set2: [10, 11, 12, 13, 14, 15],
+      set3: [16, 17, 18, 19, 20, 21, 22, 23],
     };
     const correctOrder = orders[cardSetType];
     const isCorrect = correctOrder.every((val, index) => val === array[index]);
