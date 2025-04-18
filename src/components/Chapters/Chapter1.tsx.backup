@@ -1,0 +1,152 @@
+import React, { useRef, useState, useEffect } from 'react';
+import { useCardContext } from '../CardContext'; // Adjust path as needed
+import styled from 'styled-components';
+import { useScreenVisibility } from '../ScreenVisibilityContext';
+import { TypeAnimation } from 'react-type-animation';
+import { Html5Qrcode } from 'html5-qrcode';
+import Carousel from 'react-spring-3d-carousel';
+import { config } from 'react-spring';
+
+const CardContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+`;
+
+const Chapter1: React.FC = () => {
+  const { screenVisibility, handleScreen } = useScreenVisibility();
+  const {
+    cardData,
+    handleTempArr,
+    checkOrder,
+    getCardNumber,
+    currentArray,
+  } = useCardContext();
+
+  // Change the type of goToSlide to `number | undefined`
+  const [goToSlide, setGoToSlide] = useState<number | undefined>(undefined); // Changed from `number | null`
+
+  const [showScanner, setShowScanner] = useState(false);
+  const qrRef = useRef<Html5Qrcode | null>(null);
+
+  const currentCard = goToSlide !== undefined ? cardData[goToSlide] : null; // Changed `null` to `undefined`
+
+  const goBackToMain = () => handleScreen('main');
+  const goToChapter2 = () => handleScreen('chapter_2');
+
+  const handleCardClick = (cardIndex: number) => {
+    handleTempArr(cardData[cardIndex]);
+    setShowScanner(true);
+  };
+
+  const carouselSlides = cardData.map((card, index) => ({
+    key: index,
+    content: (
+      <div
+        onClick={() => handleCardClick(index)}
+        className="flex flex-col items-center justify-center bg-white shadow-lg rounded p-4 cursor-pointer"
+      >
+        <img
+          src={card.image}
+          alt={card.name}
+          style={{ width: '200px', height: '200px' }}
+          className="w-64 h-64 object-contain"
+        />
+        <span className="mt-2 text-xl">{getCardNumber(card.id)}</span>
+        <p className="mt-1 text-gray-600">{card.name}</p>
+      </div>
+    ),
+    onClick: () => setGoToSlide(index),
+  }));
+
+  useEffect(() => {
+    if (showScanner && currentCard) {
+      const scannerId = "qr-reader";
+      const qrCodeScanner = new Html5Qrcode(scannerId);
+      qrRef.current = qrCodeScanner;
+
+      qrCodeScanner
+        .start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: 250 },
+          (decodedText) => {
+            console.log("✅ QR Code scanned:", decodedText);
+            alert(`QR Code: ${decodedText}`);
+            qrCodeScanner.stop().then(() => setShowScanner(false));
+          },
+          () => {}
+        )
+        .catch((err) => {
+          console.error("Failed to start QR scanner", err);
+        });
+    }
+
+    return () => {
+      if (qrRef.current?.isScanning) {
+        qrRef.current.stop().then(() => qrRef.current?.clear());
+      }
+    };
+  }, [showScanner, currentCard]);
+
+  return (
+    <div>
+      <h1>Welcome to Chapter 1!</h1>
+      <TypeAnimation 
+        sequence={[
+          "It was a dark, stormy evening when the call came in. A nervous voice on the other end, trembling with something deeper than fear. The caretaker of Blackwood Mansion desperate for help. The house, passed down through generations, held more than memories. It held shadows. Secrets buried beneath its foundations. And now... something had begun to stir.", 
+          1000,
+        ]}
+        speed={50}
+      />
+
+      <div style={{ width: '500px', height: '400px', margin: '40px auto' }}>
+        <Carousel
+          slides={carouselSlides}
+          goToSlide={goToSlide} // `undefined` is now a valid value here
+          offsetRadius={2}
+          showNavigation={true}
+          animationConfig={config.gentle}
+        />
+      </div>
+
+      <button
+        onClick={() => {
+          if (currentArray.length === cardData.length) {
+            checkOrder(currentArray);
+          } else {
+            alert('Please click all cards first.');
+          }
+        }}
+      >
+        Check Order
+      </button>
+
+      <button onClick={goBackToMain}>Back to Main</button>
+      <button onClick={goToChapter2}>Go to Chapter 2</button>
+
+      {showScanner && (
+        <div className="fixed top-0 left-0 w-full h-full z-50 bg-black bg-opacity-80 flex justify-center items-center">
+          <div className="bg-white p-4 rounded-lg">
+            <div id="qr-reader" style={{ width: '300px' }}></div>
+            <button
+              onClick={() => {
+                if (qrRef.current?.isScanning) {
+                  qrRef.current.stop().then(() => {
+                    qrRef.current?.clear();
+                    setShowScanner(false);
+                  });
+                } else {
+                  setShowScanner(false);
+                }
+              }}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+            >
+              Close Scanner
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Chapter1;
