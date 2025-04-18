@@ -2,25 +2,16 @@ import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useScreenVisibility } from '../ScreenVisibilityContext';
 
-// Animations
-const spin = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
-
+// === Animations ===
 const flicker = keyframes`
-  0% { opacity: 0.1; text-shadow: 0 0 5px #fff; }
-  2% { opacity: 1; text-shadow: 0 0 10px #fff, 0 0 20px #ff0000; }
-  8% { opacity: 0.1; text-shadow: 0 0 5px #fff; }
-  9% { opacity: 1; text-shadow: 0 0 10px #fff, 0 0 20px #ff0000; }
-  12% { opacity: 0.1; text-shadow: 0 0 5px #fff; }
-  20% { opacity: 1; text-shadow: 0 0 10px #fff, 0 0 30px #ff0000; }
-  25% { opacity: 0.3; text-shadow: 0 0 5px #fff; }
-  30% { opacity: 1; text-shadow: 0 0 10px #fff, 0 0 20px #ff0000; }
-  70% { opacity: 0.7; text-shadow: 0 0 5px #fff; }
-  72% { opacity: 0.2; text-shadow: 0 0 5px #fff; }
-  77% { opacity: 0.9; text-shadow: 0 0 10px #fff, 0 0 30px #ff0000; }
-  100% { opacity: 0.9; text-shadow: 0 0 5px #fff, 0 0 20px #ff0000; }
+  0%, 100% { opacity: 0.1; text-shadow: 0 0 5px #fff; }
+  2%, 9%, 30%, 77% {
+    opacity: 1;
+    text-shadow: 0 0 10px #fff, 0 0 20px #ff0000;
+  }
+  20% { text-shadow: 0 0 30px #ff0000; }
+  25%, 70% { opacity: 0.3; }
+  72% { opacity: 0.2; }
 `;
 
 const letterAppear = keyframes`
@@ -28,7 +19,7 @@ const letterAppear = keyframes`
   100% { opacity: 1; transform: translateY(0); }
 `;
 
-// Styled components
+// === Styled Components ===
 const SplashContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -36,25 +27,25 @@ const SplashContainer = styled.div`
   align-items: center;
   width: 400px;
   height: 800px;
-  background-image: url('/images/splash-screen.webp');
+  background-image: url("/projects/blackwood-mansion/assets/images/splash02.webp");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  position: relative;
 `;
 
 const AnimatedTitle = styled.div`
   font-size: 48px;
   font-family: 'Times New Roman', serif;
   font-weight: 700;
-  line-height: 1.2;
   text-align: center;
   margin-bottom: 20px;
   color: #e6e6e6;
   animation: ${flicker} 4s infinite alternate;
-  
+  line-height: 1.2;
+
   @media (max-width: 480px) {
     font-size: 36px;
-    margin-bottom: 15px;
   }
 `;
 
@@ -70,21 +61,49 @@ const LetterSpan = styled.span<LetterSpanProps>`
   text-shadow: 0 0 5px #fff, 0 0 10px #ff0000;
 `;
 
-const LoadingSpinner = styled.div`
-  border: 4px solid rgba(255, 0, 0, 0.3);
-  border-radius: 50%;
-  border-top: 4px solid #ff0000;
-  width: 40px;
-  height: 40px;
-  animation: ${spin} 1s linear infinite;
-  margin-top: 20px;
-  
-  @media (max-width: 480px) {
-    width: 30px;
-    height: 30px;
-  }
+const BottomLoaderContainer = styled.div`
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
+const DangerIcon = styled.img`
+  width: 80px;
+  height: 80px;
+  animation: ${flicker} 2s infinite alternate;
+  margin-bottom: 5px;
+`;
+
+const LoadingBarContainer = styled.div`
+  width: 80%;
+  height: 16px;
+  border: 2px solid #ff0000;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+`;
+
+const LoadingBarFill = styled.div<{ width: number }>`
+  width: ${props => props.width}%;
+  height: 100%;
+  background: linear-gradient(to right, #ff0000, #880000);
+  transition: width 0.2s ease-in-out;
+`;
+
+const LoadingText = styled.div`
+  margin-top: 8px;
+  font-size: 16px;
+  color: #ff4d4d;
+  font-weight: bold;
+  text-shadow: 0 0 5px #000;
+`;
+
+// === Horror Title Component ===
 interface HorrorTitleProps {
   text: string;
   startDelay?: number;
@@ -92,13 +111,12 @@ interface HorrorTitleProps {
 
 const HorrorTitle: React.FC<HorrorTitleProps> = ({ text, startDelay = 0 }) => {
   const letters = text.split('');
-  
   return (
     <AnimatedTitle>
       {letters.map((letter: string, index: number) => (
-        <LetterSpan 
-          key={index} 
-          delay={startDelay + (index * 0.1)}
+        <LetterSpan
+          key={index}
+          delay={startDelay + index * 0.1}
         >
           {letter === ' ' ? '\u00A0' : letter}
         </LetterSpan>
@@ -107,20 +125,34 @@ const HorrorTitle: React.FC<HorrorTitleProps> = ({ text, startDelay = 0 }) => {
   );
 };
 
+// === Splash Page ===
 export default function SplashPage() {
   const { handleScreen } = useScreenVisibility();
   const [showSecondLine, setShowSecondLine] = useState(false);
+  const [loadingPercent, setLoadingPercent] = useState(0);
 
   useEffect(() => {
+    // Slow down loading bar: 100 steps x 80ms = 8s
+    const loadingInterval = setInterval(() => {
+      setLoadingPercent(prev => {
+        if (prev >= 100) {
+          clearInterval(loadingInterval);
+          return 100;
+        }
+        return prev + 1;
+      });
+    }, 80);
+
     const secondLineTimer = setTimeout(() => {
       setShowSecondLine(true);
-    }, 1500);
+    }, 1000); // Blackwood first, Mansion after 1s
 
     const redirectTimer = setTimeout(() => {
       handleScreen('main');
-    }, 5000);
+    }, 9000); // Total 9 seconds splash screen
 
     return () => {
+      clearInterval(loadingInterval);
       clearTimeout(secondLineTimer);
       clearTimeout(redirectTimer);
     };
@@ -130,7 +162,14 @@ export default function SplashPage() {
     <SplashContainer>
       <HorrorTitle text="Blackwood" />
       {showSecondLine && <HorrorTitle text="Mansion" startDelay={0.5} />}
-      <LoadingSpinner />
+
+      <BottomLoaderContainer>
+        <DangerIcon src="/projects/blackwood-mansion/assets/images/danger01.png" alt="Danger" />
+        <LoadingBarContainer>
+          <LoadingBarFill width={loadingPercent} />
+        </LoadingBarContainer>
+        <LoadingText>{loadingPercent}% Loading</LoadingText>
+      </BottomLoaderContainer>
     </SplashContainer>
   );
 }

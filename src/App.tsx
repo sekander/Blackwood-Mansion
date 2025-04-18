@@ -6,6 +6,8 @@ import SplashPage from './components/Splash/SplashPage';
 import MainPage from './components/Main/MainPage';
 
 import { ScreenVisibilityProvider } from './components/ScreenVisibilityContext';
+import { CardProvider } from './components/CardContext'; // Assuming you saved it here
+
 import { useScreenVisibility } from './components/ScreenVisibilityContext';
 import Chapter1 from './components/Chapters/Chapter1';
 import Chapter2 from './components/Chapters/Chapter2';
@@ -44,7 +46,9 @@ function App() {
 // Wrap the App component with the ScreenVisibilityProvider to enable context usage
 const AppWithProvider = () => (
   <ScreenVisibilityProvider>
-    <App />
+    <CardProvider>
+      <App />
+    </CardProvider>
   </ScreenVisibilityProvider>
 );
 
