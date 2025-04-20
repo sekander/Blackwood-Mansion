@@ -10,6 +10,7 @@ import { useCardContext } from '../CardContext';
 
 import { useDrag } from '@use-gesture/react';
 import { animated } from '@react-spring/web';
+import { get } from 'http';
 
 
 Modal.setAppElement('#root');
@@ -63,6 +64,7 @@ const Chapter1: React.FC = () => {
   const [scanData, setScanData] = useState<string>('Not Found');
   const [jsonData, setJsonData] = useState<any>(null);
   const [refreshCounter, setRefreshCounter] = useState(0);
+  const [arrayOrder, setArrayOrder] = useState<number[]>([]); 
 
 
   const [cardImages, setCardImages] = useState([
@@ -84,15 +86,28 @@ const Chapter1: React.FC = () => {
     checkOrder,
     getCardNumber,
     currentArray,
+    // getSetOrder,
+    getCardSet,
+    cardSetType,
+    getSetOrder,
+    
+    setCardSet,
     // setCardSet,
     
   } = useCardContext();
 
   // setCardSet('set1');
+  // useEffect(() => {
+  //   setCardSet('set1'); // triggers safe update now
+  // }, [setCardSet]);
+  useEffect(() => {
+    setCardSet('set1');
+  }, []); // empty array means it only runs once
 
   const [goToSlide, setGoToSlide] = useState<number | undefined>(undefined);
+  const [currentCardIndex, setCurrentCardIndex] = useState<number>(0);
   const lastFetchedURL = useRef<string | null>(null);
-  currentArray.length = 0; // Clear the currentArray
+  // currentArray.length = 0; // Clear the currentArray
 
   useEffect(() => {
     if (jsonData && jsonData.id) {
@@ -130,7 +145,8 @@ const Chapter1: React.FC = () => {
   const goToChapter2 = () => handleScreen('chapter_2');
 
   const handleCardClick = (cardIndex: number) => {
-    handleTempArr(cardData[cardIndex]);
+    // handleTempArr(cardData[cardIndex]);
+    setCurrentCardIndex(cardIndex);
     setShowModal(true);
   };
 
@@ -222,11 +238,15 @@ const Chapter1: React.FC = () => {
                     // Update the JSON data display section
                     if (json.id) 
                     {
-                      const matchedCard = cardData.find(card => card.id === json.id);
+                      // const matchedCard = cardData.find(card => card.id === json.id);
+                      const matchedCard = cardData[json.id - 1];
+                      // const matchedCard = cardData[currentCardIndex];
+                      
 
-                      if (matchedCard) 
-                      {
+                      // if (matchedCard) 
+                      // {
                         const audio = new Audio(matchedCard.audio);
+                        // const audio = new Audio(json.audio);
                         audio.play();
                         // Open a new modal to display card details
                         setShowModal(false); // Close the QR modal
@@ -263,6 +283,7 @@ const Chapter1: React.FC = () => {
                             <body>
                             <h1>${matchedCard.name}</h1>
                             <img src="${matchedCard.image}" alt="${matchedCard.name}" />
+                            <p>${currentCardIndex}</p>
                             <button id="playAudio">Play Audio</button>
                             <button id="addToSequence">Add to Sequence</button>
                             <button id="closeModal">Close Modal</button>
@@ -289,15 +310,18 @@ const Chapter1: React.FC = () => {
                             if (addToSequenceButton) {
                               addToSequenceButton.addEventListener('click', () => {
                                 // temparry.push(matchedCard.id);
-                                // if (!currentArray.includes(matchedCard.id)) 
+                                if (!arrayOrder.includes(matchedCard.id)) 
                                 {
-                                  currentArray.push(matchedCard.id);
+                                  // currentArray.push(matchedCard.id);
+                                  // setArrayOrder(prev => [...prev, matchedCard.id]);
+                                  setArrayOrder(prev => [...prev, json.id]);
                                   setJsonData(matchedCard);
-                                  alert('Card added to the sequence!');
+                                  // alert('Card added to the sequence!');
+                                  // getCardSet(cardSetType);
                                 } 
-                                //else {
-                                //  alert('Card is already in the sequence!');
-                                //}
+                                else {
+                                 alert('Card is already in the sequence!');
+                                }
                                 // setJsonData(matchedCard);
                                 // alert('Card added to the sequence!');
                                 newModal.close();
@@ -307,10 +331,10 @@ const Chapter1: React.FC = () => {
                         }
 
                         // setJsonData(matchedCard);
-                        console.log('Matched Card:', matchedCard);
-                      } else {
-                        console.warn(`No matching card in cardData with id ${json.id}`);
-                      }
+                        // console.log('Matched Card:', matchedCard);
+                      // } else {
+                      //   console.warn(`No matching card in cardData with id ${json.id}`);
+                      // }
                     }
                   // setJsonData(json);
                   closeModal();
@@ -343,6 +367,7 @@ const Chapter1: React.FC = () => {
       <button
         onClick={() => {
           currentArray.length = 0; // Clear the currentArray
+          arrayOrder.length = 0; // Clear the arrayOrder
           
           setCardImages([
             { id: 1, name: 'Placeholder 1', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
@@ -364,11 +389,16 @@ const Chapter1: React.FC = () => {
 
       <button
         onClick={() => {
-          if (currentArray.length === cardData.length) {
-            checkOrder(currentArray);
+          if (arrayOrder.length === cardData.length) {
+            checkOrder(arrayOrder, cardSetType);
           } else {
-            alert(`Please click all cards first. : ${JSON.stringify(currentArray, null, 2)}`);
+            alert(`Please click all cards first. : ${JSON.stringify(arrayOrder, null, 2)} \n` + 
+            `Please click all cards first. : ${JSON.stringify(getSetOrder(cardSetType), null, 2)} \n` + 
+            
+            `Please click all cards first. : ${cardSetType} \n`);
           }
+          
+          // alert(`Please click all cards first. : ${JSON.stringify(jsonData, null, 2)}`);
         }}
       >
         Check Order
