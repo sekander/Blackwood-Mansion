@@ -194,15 +194,17 @@ const Chapter1: React.FC = () => {
 
   return (
     <div>
-      <h1>Welcome to Chapter 1!</h1>
+      <h1 style={{paddingTop: '20px'}}>Welcome to Chapter 1!</h1>
 
-      <TypeAnimation
-        sequence={[
-          "It was a dark, stormy evening when the call came in. A nervous voice on the other end, trembling with something deeper than fear. The caretaker of Blackwood Mansion desperate for help. The house, passed down through generations, held more than memories. It held shadows. Secrets buried beneath its foundations. And now... something had begun to stir.",
-          1000,
-        ]}
-        speed={50}
-      />
+      <div style={{ height: '150px', width: '360px', overflow: 'hidden' }}>
+        <TypeAnimation
+          sequence={[
+        "It was a dark, stormy evening when the call came in. A nervous voice on the other end, trembling with something deeper than fear. The caretaker of Blackwood Mansion desperate for help. The house, passed down through generations, held more than memories. It held shadows. Secrets buried beneath its foundations. And now... something had begun to stir.",
+        1000,
+          ]}
+          speed={50}
+        />
+      </div>
 
       <Modal
         isOpen={showModal}
@@ -236,7 +238,8 @@ const Chapter1: React.FC = () => {
                     setJsonData(json);
 
                     // Update the JSON data display section
-                    if (json.id) 
+                    // if (json.id) 
+                    if (!arrayOrder.includes(json.id)) 
                     {
                       // const matchedCard = cardData.find(card => card.id === json.id);
                       const matchedCard = cardData[json.id - 1];
@@ -250,6 +253,7 @@ const Chapter1: React.FC = () => {
                         audio.play();
                         // Open a new modal to display card details
                         setShowModal(false); // Close the QR modal
+
                         const newModal = window.open('', '_blank', 'width=600,height=400');
                         if (newModal) {
                             newModal.document.write(`
@@ -335,6 +339,10 @@ const Chapter1: React.FC = () => {
                       // } else {
                       //   console.warn(`No matching card in cardData with id ${json.id}`);
                       // }
+                      // closeModal();
+                    }
+                    else{
+                      alert('Card is already in the sequence!');
                     }
                   // setJsonData(json);
                   closeModal();
@@ -349,63 +357,167 @@ const Chapter1: React.FC = () => {
         </div>
       </Modal>
 
-      {/* <div style={{ width: '500px', height: '400px', margin: '40px auto', overflow: 'hidden' }}> */}
-      <div style={{ width: '300px', height: '400px', margin: '40px auto', overflow: 'hidden' }}>
-        <AnimatedDiv {...bind()} style={{ touchAction: 'pan-y', cursor: 'grab', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <Carousel
-          key={refreshCounter} // force remount when updated
-          slides={carouselSlides}
-          goToSlide={goToSlide}
-          offsetRadius={2}
-          showNavigation={true}
-          animationConfig={config.gentle}
-        />
-        </AnimatedDiv>
 
+
+      <div className="card-order-display">
+        <h2>Card Order</h2>
+        <div className="card-order-grid">
+          {cardImages.map((card, index) => (
+        <div
+          key={card.id}
+          className={`card-order-item ${
+            arrayOrder.includes(card.id) ? 'scanned' : 'not-scanned'
+          }`}
+        >
+          <img
+            src={card.image}
+            alt={card.name}
+            style={{ width: '40px', height: '60px' }}
+            className="object-contain"
+          />
+          <p>
+            {arrayOrder.includes(card.id) ? (
+          <span>
+            <span role="img" aria-label="scanned">
+            </span>{' '}
+            {arrayOrder.indexOf(card.id) + 1}
+          </span>
+            ) : (
+          <span role="img" aria-label="not-scanned">
+          </span>
+            )}
+          </p>
+        </div>
+          ))}
+        </div>
       </div>
 
-      <button
-        onClick={() => {
-          currentArray.length = 0; // Clear the currentArray
-          arrayOrder.length = 0; // Clear the arrayOrder
-          
-          setCardImages([
-            { id: 1, name: 'Placeholder 1', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
-            { id: 2, name: 'Placeholder 2', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
-            { id: 3, name: 'Placeholder 3', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
-            { id: 4, name: 'Placeholder 4', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
-            { id: 5, name: 'Placeholder 5', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
-            { id: 6, name: 'Placeholder 6', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
-            { id: 7, name: 'Placeholder 7', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
-            { id: 8, name: 'Placeholder 8', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
-            { id: 9, name: 'Placeholder 9', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
-          ]);
-
-          alert('Order has been cleared!');
-        }}
-      >
-        Clear Order
-      </button>
-
-      <button
-        onClick={() => {
-          if (arrayOrder.length === cardData.length) {
-            checkOrder(arrayOrder, cardSetType);
-          } else {
-            alert(`Please click all cards first. : ${JSON.stringify(arrayOrder, null, 2)} \n` + 
-            `Please click all cards first. : ${JSON.stringify(getSetOrder(cardSetType), null, 2)} \n` + 
-            
-            `Please click all cards first. : ${cardSetType} \n`);
+      <style>
+        {`
+          .card-order-display {
+        margin: 20px auto;
+        text-align: center;
+        scale: 0.8;
+transform: translateY(-47px);
           }
-          
-          // alert(`Please click all cards first. : ${JSON.stringify(jsonData, null, 2)}`);
-        }}
-      >
-        Check Order
-      </button>
+          .card-order-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+        grid-template-rows: repeat(2, auto);
+        gap: 10px;
+        margin-top: 10px;
+          }
+          .card-order-item {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 5px;
+        text-align: center;
+        background-color: #f9f9f9;
+          }
+          .card-order-item.scanned {
+        background-color: #d4edda; /* Light green for scanned */
+        border-color: #c3e6cb;
+          }
+          .card-order-item.not-scanned {
+        background-color: #f8d7da; /* Light red for not scanned */
+        border-color: #f5c6cb;
+          }
+        `}
+      </style>
 
-      <button onClick={goBackToMain}>Back to Main</button>
-      <button onClick={goToChapter2}>Go to Chapter 2</button>
+      <div style={{ width: '300px', height: '400px', margin: '20px auto', overflow: 'hidden', transform: 'translateY(-120px)', position: 'relative' }}>
+        <AnimatedDiv {...bind()} style={{ touchAction: 'pan-y', cursor: 'grab', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} data-testid="carousel-container">
+          <Carousel
+        key={refreshCounter} // force remount when updated
+        slides={carouselSlides}
+        goToSlide={goToSlide}
+        offsetRadius={2}
+        showNavigation={false} // Disable default navigation buttons
+        animationConfig={config.gentle}
+          />
+        </AnimatedDiv>
+        <button
+          onClick={() => setGoToSlide((prev) => (prev !== undefined ? Math.max(0, prev - 1) : 0))}
+          style={{
+        position: 'absolute',
+        top: '50%',
+        left: '10px',
+        transform: 'translateY(-50%)',
+        backgroundColor: '#4CAF50',
+        color: 'white',
+        border: 'none',
+        borderRadius: '50%',
+        width: '40px',
+        height: '40px',
+        cursor: 'pointer',
+          }}
+        >
+          ◀
+        </button>
+        <button
+          onClick={() => setGoToSlide((prev) => (prev !== undefined ? Math.min(carouselSlides.length - 1, prev + 1) : 0))}
+          style={{
+        position: 'absolute',
+        top: '50%',
+        right: '10px',
+        transform: 'translateY(-50%)',
+        backgroundColor: '#4CAF50',
+        color: 'white',
+        border: 'none',
+        borderRadius: '50%',
+        width: '40px',
+        height: '40px',
+        cursor: 'pointer',
+          }}
+        >
+          ▶
+        </button>
+      </div>
+
+      <div className='button-group' style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', justifyContent: 'center', transform: 'translateY(-125px)' }}>
+        <button
+          onClick={() => {
+            currentArray.length = 0; // Clear the currentArray
+            arrayOrder.length = 0; // Clear the arrayOrder
+            
+            setCardImages([
+              { id: 1, name: 'Placeholder 1', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
+              { id: 2, name: 'Placeholder 2', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
+              { id: 3, name: 'Placeholder 3', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
+              { id: 4, name: 'Placeholder 4', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
+              { id: 5, name: 'Placeholder 5', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
+              { id: 6, name: 'Placeholder 6', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
+              { id: 7, name: 'Placeholder 7', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
+              { id: 8, name: 'Placeholder 8', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
+              { id: 9, name: 'Placeholder 9', image: '/projects/blackwood-mansion/assets/images/ch1.png', audio: 'Scan QR to update' },
+            ]);
+
+            alert('Order has been cleared!');
+          }}
+        >
+          Clear Order
+        </button>
+
+        <button
+          onClick={() => {
+            if (arrayOrder.length === cardData.length) {
+              checkOrder(arrayOrder, cardSetType);
+            } else {
+              alert(`Please click all cards first. : ${JSON.stringify(arrayOrder, null, 2)} \n` + 
+              `Please click all cards first. : ${JSON.stringify(getSetOrder(cardSetType), null, 2)} \n` + 
+              
+              `Please click all cards first. : ${cardSetType} \n`);
+            }
+            
+            // alert(`Please click all cards first. : ${JSON.stringify(jsonData, null, 2)}`);
+          }}
+        >
+          Check Order
+        </button>
+
+        <button onClick={goBackToMain}>Back to Main</button>
+        <button onClick={goToChapter2}>Go to Chapter 2</button>
+      </div>
     </div>
   );
 };
