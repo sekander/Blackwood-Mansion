@@ -1,4 +1,25 @@
 /* In src/App.css */
+
+h1,h2,h3,h4,p {
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  font-family: "Libre Caslon Display", serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 21px;
+}
+
+.intro-phrase-style {
+  font-family: "Libre Caslon Display", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+
 body, html {
   margin: 0;
   padding: 0;
@@ -42,6 +63,11 @@ body, html {
   color: #61dafb;
 }
 
+.screen-wrap {
+  padding: 5px 20px;
+  background-image: url(../public/assets/images/blackwoodbg.png);
+  background-color: #09090f;
+}
 
 .qr-modal {
   position: fixed;
@@ -110,6 +136,113 @@ body, html {
   border-radius: 8px;
 }
 
+.spooky-bg-1 {
+  background: linear-gradient(135deg, #0f0f2d, #3c3c5a);
+  color: #f0f0f0;
+}
+
+.spooky-bg-2 {
+  background: radial-gradient(circle at 30% 30%, #1b1b2f, #09090f 70%);
+  color: #e5e5e5;
+}
+
+.spooky-bg-3 {
+  background: linear-gradient(to right, #222831, #1a1a2e, #0f3460);
+  color: #dddddd;
+}
+
+.button-group {
+  margin-top: 150px;
+}
+
+.chapter-title-color {
+  color: #b07703;
+}
+
+.chapter-p-color {
+  color: #e1550a;
+}
+
+
+.spooky-btn {
+  background: linear-gradient(to right, #2c2c54, #23234f);
+  border: 1px solid #6c6c9f;
+  color: #e2e2f2;
+  padding: 5px 10px;
+  font-weight: 600;
+  font-size: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(100, 100, 180, 0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+.spooky-btn:hover {
+  background: linear-gradient(to right, #3a3a6c, #1c1c3c);
+  box-shadow: 0 0 15px rgba(130, 130, 200, 0.5);
+  transform: scale(1.05);
+}
+
+.card-order-container {
+  margin: 0 auto;
+  text-align: center;
+  min-height: 190px;
+
+}
+
+.card-order-flex {
+  display: flex;
+  /* gap: 5px; */
+  margin-top: 10px auto;
+  flex-wrap: wrap;
+
+}
+
+.card-order-item{
+  transform: scale(0.8);
+}
+
+.carousel-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  height: 220px; /* or whatever fits your mobile layout */
+  overflow: hidden;
+  /* margin: 10px 0; Optional spacing around carousel */
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(to right, #2c2c54, #23234f);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.carousel-nav.left {
+  left: 10px;
+}
+
+.carousel-nav.right {
+  right: 10px;
+}
+
+.css-1qzevvg {
+  position: relative;
+  display: flex;
+  height: 49px;
+  margin: 1rem auto 0px;
+  width: 20%;
+  -moz-box-pack: justify;
+  justify-content: space-between;
+  transform: translate(-50%, -75%);
+}
 
 
 /* Adjust for smaller screens */

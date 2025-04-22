@@ -14,13 +14,13 @@ import Chapter2 from './components/Chapters/Chapter2';
 import Chapter3 from './components/Chapters/Chapter3';
 
 const StyledFrame = styled.div`
-  width: 400px;
-  height: 800px;
-  display: flex;               /* Enables Flexbox */
-  flex-direction: column;
-  justify-content: center;     /* Centers horizontally */
-  align-items: center;         /* Centers vertically */
-  border: 2px solid black;
+//  width: auto;
+//  height: 100%;
+//  display: flex;               /* Enables Flexbox */
+//  flex-direction: column;
+//  justify-content: center;     /* Centers horizontally */
+//  align-items: center;         /* Centers vertically */
+//  border: 2px solid black;
 `;
 
 function App() {

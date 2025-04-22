@@ -91,6 +91,8 @@ const Chapter3: React.FC = () => {
     getSetOrder,
     
     setCardSet,
+    isCorrectOrder,
+    setIsCorrectOrder
     
   } = useCardContext();
 
@@ -104,6 +106,9 @@ const Chapter3: React.FC = () => {
   //}, [setCardSet]);
   useEffect(() => {
     setCardSet('set3');
+    setIsCorrectOrder(false);
+    const audio = new Audio('/projects/blackwood-mansion/assets/audio/CHAPTER_3_INTRODUCTION_NARRATIVE_mixdown.mp3');
+    audio.play();
   }, []); // empty array means it only runs once
   
 
@@ -153,6 +158,7 @@ const Chapter3: React.FC = () => {
     setShowModal(true);
   };
 
+  
   const carouselSlides = cardImages.map((card, index) => ({
     key: index,
     content: (
@@ -181,8 +187,8 @@ const Chapter3: React.FC = () => {
       if (!down && Math.hypot(...velocity) > 0.2) {
         const newIndex =
           xDir < 0
-            ? Math.min(cardImages.length - 1, indexRef.current + 1) // Swipe Left
-            : Math.max(0, indexRef.current - 1); // Swipe Right
+            ? (indexRef.current + 1) % cardImages.length // Swipe Left, loop to start
+            : (indexRef.current - 1 + cardImages.length) % cardImages.length; // Swipe Right, loop to end
 
         indexRef.current = newIndex;
         setGoToSlide(newIndex);
@@ -191,21 +197,23 @@ const Chapter3: React.FC = () => {
     {
       filterTaps: true,
       axis: 'x',
-      pointer: { touch: true , buttons: [1]},
+      pointer: { touch: true, buttons: [1] },
     }
   );
 
   return (
-    <div>
+    <div className="screen-wrap">
       <h1>Welcome to Chapter 3!</h1>
 
-      <TypeAnimation
-        sequence={[
-            "The detective’s hand hovered over the cursed journal, but the sudden sound of footsteps froze him. Hooded cloaked figures emerged from the shadows with glowing eyes.",
-          1000,
-        ]}
-        speed={50}
-      />
+      <div className="intro-phrase-style chapter-p-color" style={{ height: '150px', width: '360px', overflow: 'hidden', transform: 'translateY(55px)', position: 'relative', margin: '0 auto' }}>
+        <TypeAnimation
+          sequence={[
+              "The detective’s hand hovered over the cursed journal, but the sudden sound of footsteps froze him. Hooded cloaked figures emerged from the shadows with glowing eyes.",
+            1000,
+          ]}
+          speed={50}
+        />
+      </div>
 
       <Modal
         isOpen={showModal}
@@ -315,29 +323,17 @@ const Chapter3: React.FC = () => {
                                 // temparry.push(matchedCard.id);
                                 if (!arrayOrder.includes(matchedCard.id)) 
                                 {
-                                  // currentArray.push(matchedCard.id);
-                                  // setArrayOrder(prev => [...prev, matchedCard.id]);
                                   setArrayOrder(prev => [...prev, json.id]);
                                   setJsonData(matchedCard);
-                                  // alert('Card added to the sequence!');
-                                  // getCardSet(cardSetType);
                                 } 
                                 else {
                                  alert('Card is already in the sequence!');
                                 }
-                                // setJsonData(matchedCard);
-                                // alert('Card added to the sequence!');
                                 newModal.close();
                                 // currentArray.push(matchedCard.id);
                               });
                             }
                         }
-
-                        // setJsonData(matchedCard);
-                        // console.log('Matched Card:', matchedCard);
-                      // } else {
-                      //   console.warn(`No matching card in cardData with id ${json.id}`);
-                      // }
                     }
                   // setJsonData(json);
                   closeModal();
@@ -351,63 +347,133 @@ const Chapter3: React.FC = () => {
           <p>Scanned Data: {scanData}</p>
         </div>
       </Modal>
+      
+      <div className="card-order-display">
+        <h2>Card Order</h2>
+        <div className="card-order-grid">
+          {cardImages.map((card, index) => (
+        <div
+          key={card.id}
+          className={`card-order-item ${
+            arrayOrder.includes(card.id) ? 'scanned' : 'not-scanned'
+          }`}
+        >
+          <img
+            src={card.image}
+            alt={card.name}
+            style={{ width: '40px', height: '60px' }}
+            className="object-contain"
+          />
+          <p>
+            {arrayOrder.includes(card.id) ? (
+          <span>
+            <span role="img" aria-label="scanned">
+            </span>{' '}
+            {arrayOrder.indexOf(card.id) + 1}
+          </span>
+            ) : (
+          <span role="img" aria-label="not-scanned">
+          </span>
+            )}
+          </p>
+        </div>
+          ))}
+        </div>
+      </div>
 
-      {/* <div style={{ width: '500px', height: '400px', margin: '40px auto', overflow: 'hidden' }}> */}
-      <div style={{ width: '300px', height: '400px', margin: '40px auto', overflow: 'hidden' }}>
+      <style>
+        {`
+          .card-order-display {
+        margin: 20px auto;
+        text-align: center;
+        scale: 0.8;
+transform: translateY(35px);
+          }
+          .card-order-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+        grid-template-rows: repeat(2, auto);
+        gap: 10px;
+        margin-top: 10px;
+          }
+          .card-order-item {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 5px;
+        text-align: center;
+        background-color: #f9f9f9;
+          }
+          .card-order-item.scanned {
+        background-color: #d4edda; /* Light green for scanned */
+        border-color: #c3e6cb;
+          }
+          .card-order-item.not-scanned {
+        background-color: #f8d7da; /* Light red for not scanned */
+        border-color: #f5c6cb;
+          }
+        `}
+      </style>
+
+
+      <div style={{ width: '300px', height: '400px', margin: '20px auto', overflow: 'hidden', transform: 'translateY(-60px)', position: 'relative' }}>
         <AnimatedDiv {...bind()} style={{ touchAction: 'pan-y', cursor: 'grab', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <Carousel
           key={refreshCounter} // force remount when updated
           slides={carouselSlides}
           goToSlide={goToSlide}
           offsetRadius={2}
-          showNavigation={true}
+          showNavigation={false}
           animationConfig={config.gentle}
         />
         </AnimatedDiv>
 
       </div>
 
-      <button
-        onClick={() => {
-          currentArray.length = 0; // Clear the currentArray
-          arrayOrder.length = 0; // Clear the arrayOrder
-          
-          setCardImages([
-            { id: 1, name: 'Placeholder 1', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 2, name: 'Placeholder 2', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 3, name: 'Placeholder 3', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 4, name: 'Placeholder 4', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 5, name: 'Placeholder 5', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 6, name: 'Placeholder 6', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 7, name: 'Placeholder 7', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 8, name: 'Placeholder 8', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-          ]);
-
-          alert('Order has been cleared!');
-        }}
-      >
-        Clear Order
-      </button>
-
-      <button
-        onClick={() => {
-          if (arrayOrder.length === cardData.length) {
-            checkOrder(arrayOrder, cardSetType);
-          } else {
-            alert(`Please click all cards first. : ${JSON.stringify(arrayOrder, null, 2)} \n` + 
-            `Please click all cards first. : ${JSON.stringify(getSetOrder(cardSetType), null, 2)} \n` + 
+      <div className='button-group' style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', justifyContent: 'center', transform: 'translateY(-125px)' }}>
+        <button
+          onClick={() => {
+            currentArray.length = 0; // Clear the currentArray
+            arrayOrder.length = 0; // Clear the arrayOrder
             
-            `Please click all cards first. : ${cardSetType} \n`);
-          }
-          
-          // alert(`Please click all cards first. : ${JSON.stringify(jsonData, null, 2)}`);
-        }}
-      >
-        Check Order
-      </button>
+            setCardImages([
+              { id: 1, name: 'Placeholder 1', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+              { id: 2, name: 'Placeholder 2', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+              { id: 3, name: 'Placeholder 3', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+              { id: 4, name: 'Placeholder 4', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+              { id: 5, name: 'Placeholder 5', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+              { id: 6, name: 'Placeholder 6', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+              { id: 7, name: 'Placeholder 7', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+              { id: 8, name: 'Placeholder 8', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+            ]);
 
-      <button onClick={goBackToMain}>Back to Main</button>
-      {/* <button onClick={goToChapter3}>Go to Chapter 3</button> */}
+            alert('Order has been cleared!');
+          }}
+          className='spooky-btn'
+        >
+          Clear Order
+        </button>
+
+        <button
+          onClick={() => {
+            if (arrayOrder.length === cardData.length) {
+              checkOrder(arrayOrder, cardSetType);
+            } else {
+              alert(`Please click all cards first. : ${JSON.stringify(arrayOrder, null, 2)} \n` + 
+              `Please click all cards first. : ${JSON.stringify(getSetOrder(cardSetType), null, 2)} \n` + 
+              
+              `Please click all cards first. : ${cardSetType} \n`);
+            }
+            
+            // alert(`Please click all cards first. : ${JSON.stringify(jsonData, null, 2)}`);
+          }}
+          className='spooky-btn'
+        >
+          Check Order
+        </button>
+
+        <button className='spooky-btn' onClick={goBackToMain}>Back to Main</button>
+        {/* <button onClick={goToChapter3}>Go to Chapter 3</button> */}
+      </div>
     </div>
   );
 };

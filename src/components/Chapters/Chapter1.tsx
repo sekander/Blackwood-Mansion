@@ -12,7 +12,6 @@ import { useDrag } from '@use-gesture/react';
 import { animated } from '@react-spring/web';
 import { get } from 'http';
 
-
 Modal.setAppElement('#root');
 
 const CardContainer = styled.div`
@@ -86,28 +85,26 @@ const Chapter1: React.FC = () => {
     checkOrder,
     getCardNumber,
     currentArray,
-    // getSetOrder,
     getCardSet,
     cardSetType,
     getSetOrder,
     
     setCardSet,
-    // setCardSet,
+    isCorrectOrder,
     
   } = useCardContext();
 
-  // setCardSet('set1');
-  // useEffect(() => {
-  //   setCardSet('set1'); // triggers safe update now
-  // }, [setCardSet]);
   useEffect(() => {
     setCardSet('set1');
+    const audio = new Audio('/projects/blackwood-mansion/assets/audio/PROLOGUE.mp3');
+    audio.play();
   }, []); // empty array means it only runs once
 
   const [goToSlide, setGoToSlide] = useState<number | undefined>(undefined);
   const [currentCardIndex, setCurrentCardIndex] = useState<number>(0);
   const lastFetchedURL = useRef<string | null>(null);
-  // currentArray.length = 0; // Clear the currentArray
+
+  const [orderIsCorrect, setOrderIsCorrect] = useState(false);
 
   useEffect(() => {
     if (jsonData && jsonData.id) {
@@ -125,17 +122,13 @@ const Chapter1: React.FC = () => {
               : card
           )
         );
-        // Force rerender manually
-        // setRefreshCounter(prev => prev + 1);
       } else {
         console.warn(`No matching card in cardData with id ${jsonData.id}`);
       }
     }
-  // }, [jsonData, cardData]);
   }, [jsonData]);
 
 
-  // QR logic inside modal (reacts to scanData changes)
 
 
   const openModal = () => setShowModal(true);
@@ -145,7 +138,6 @@ const Chapter1: React.FC = () => {
   const goToChapter2 = () => handleScreen('chapter_2');
 
   const handleCardClick = (cardIndex: number) => {
-    // handleTempArr(cardData[cardIndex]);
     setCurrentCardIndex(cardIndex);
     setShowModal(true);
   };
@@ -178,8 +170,8 @@ const Chapter1: React.FC = () => {
       if (!down && Math.hypot(...velocity) > 0.2) {
         const newIndex =
           xDir < 0
-            ? Math.min(cardImages.length - 1, indexRef.current + 1) // Swipe Left
-            : Math.max(0, indexRef.current - 1); // Swipe Right
+            ? (indexRef.current + 1) % cardImages.length // Swipe Left, loop to start
+            : (indexRef.current - 1 + cardImages.length) % cardImages.length; // Swipe Right, loop to end
 
         indexRef.current = newIndex;
         setGoToSlide(newIndex);
@@ -188,15 +180,16 @@ const Chapter1: React.FC = () => {
     {
       filterTaps: true,
       axis: 'x',
-      pointer: { touch: true , buttons: [1]},
+      pointer: { touch: true, buttons: [1] },
     }
   );
 
   return (
-    <div>
+    // <div>
+    <div  className="screen-wrap">
       <h1 style={{paddingTop: '20px'}}>Welcome to Chapter 1!</h1>
 
-      <div style={{ height: '150px', width: '360px', overflow: 'hidden' }}>
+      <div className="intro-phrase-style chapter-p-color" style={{ height: '150px', width: '360px', overflow: 'hidden', transform: 'translateY(55px)', position: 'relative', margin: '0 auto' }}>
         <TypeAnimation
           sequence={[
         "It was a dark, stormy evening when the call came in. A nervous voice on the other end, trembling with something deeper than fear. The caretaker of Blackwood Mansion desperate for help. The house, passed down through generations, held more than memories. It held shadows. Secrets buried beneath its foundations. And now... something had begun to stir.",
@@ -360,8 +353,9 @@ const Chapter1: React.FC = () => {
 
 
       <div className="card-order-display">
-        <h2>Card Order</h2>
-        <div className="card-order-grid">
+        <h2 className='chapter-title-color'>Card Order</h2>
+        {/* <div className="card-order-grid"> */}
+        <div className="card-order-flex">
           {cardImages.map((card, index) => (
         <div
           key={card.id}
@@ -398,7 +392,7 @@ const Chapter1: React.FC = () => {
         margin: 20px auto;
         text-align: center;
         scale: 0.8;
-transform: translateY(-47px);
+      transform: translateY(10px);
           }
           .card-order-grid {
         display: grid;
@@ -424,57 +418,21 @@ transform: translateY(-47px);
           }
         `}
       </style>
-
-      <div style={{ width: '300px', height: '400px', margin: '20px auto', overflow: 'hidden', transform: 'translateY(-120px)', position: 'relative' }}>
-        <AnimatedDiv {...bind()} style={{ touchAction: 'pan-y', cursor: 'grab', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} data-testid="carousel-container">
-          <Carousel
-        key={refreshCounter} // force remount when updated
-        slides={carouselSlides}
-        goToSlide={goToSlide}
-        offsetRadius={2}
-        showNavigation={false} // Disable default navigation buttons
-        animationConfig={config.gentle}
-          />
+      <div style={{ width: '300px', height: '400px', margin: '20px auto', overflow: 'hidden', transform: 'translateY(-60px)', position: 'relative' }}>
+        <AnimatedDiv {...bind()} style={{ touchAction: 'pan-y', cursor: 'grab', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <Carousel
+          key={refreshCounter} // force remount when updated
+          slides={carouselSlides}
+          goToSlide={goToSlide}
+          offsetRadius={2}
+          showNavigation={false}
+          animationConfig={config.gentle}
+        />
         </AnimatedDiv>
-        <button
-          onClick={() => setGoToSlide((prev) => (prev !== undefined ? Math.max(0, prev - 1) : 0))}
-          style={{
-        position: 'absolute',
-        top: '50%',
-        left: '10px',
-        transform: 'translateY(-50%)',
-        backgroundColor: '#4CAF50',
-        color: 'white',
-        border: 'none',
-        borderRadius: '50%',
-        width: '40px',
-        height: '40px',
-        cursor: 'pointer',
-          }}
-        >
-          ◀
-        </button>
-        <button
-          onClick={() => setGoToSlide((prev) => (prev !== undefined ? Math.min(carouselSlides.length - 1, prev + 1) : 0))}
-          style={{
-        position: 'absolute',
-        top: '50%',
-        right: '10px',
-        transform: 'translateY(-50%)',
-        backgroundColor: '#4CAF50',
-        color: 'white',
-        border: 'none',
-        borderRadius: '50%',
-        width: '40px',
-        height: '40px',
-        cursor: 'pointer',
-          }}
-        >
-          ▶
-        </button>
+
       </div>
 
-      <div className='button-group' style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', justifyContent: 'center', transform: 'translateY(-125px)' }}>
+      <div className='button-group' style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', justifyContent: 'center', transform: 'translateY(-50px)' }}>
         <button
           onClick={() => {
             currentArray.length = 0; // Clear the currentArray
@@ -494,6 +452,7 @@ transform: translateY(-47px);
 
             alert('Order has been cleared!');
           }}
+          className='spooky-btn'
         >
           Clear Order
         </button>
@@ -502,6 +461,8 @@ transform: translateY(-47px);
           onClick={() => {
             if (arrayOrder.length === cardData.length) {
               checkOrder(arrayOrder, cardSetType);
+              //Loop through each array and check which order is coorect 
+              //
             } else {
               alert(`Please click all cards first. : ${JSON.stringify(arrayOrder, null, 2)} \n` + 
               `Please click all cards first. : ${JSON.stringify(getSetOrder(cardSetType), null, 2)} \n` + 
@@ -511,12 +472,15 @@ transform: translateY(-47px);
             
             // alert(`Please click all cards first. : ${JSON.stringify(jsonData, null, 2)}`);
           }}
+          className='spooky-btn'
         >
           Check Order
         </button>
 
-        <button onClick={goBackToMain}>Back to Main</button>
-        <button onClick={goToChapter2}>Go to Chapter 2</button>
+        <button className='spooky-btn' onClick={goBackToMain}>Back to Main</button>
+        {/* <button onClick={goToChapter2}>Go to Chapter 2</button> */}
+        {/* <button className='spooky-btn' onClick={goToChapter2}  disabled={!isCorrectOrder}>Go to Chapter 2</button> */}
+        <button className='spooky-btn' onClick={goToChapter2}>Go to Chapter 2</button>
       </div>
     </div>
   );
