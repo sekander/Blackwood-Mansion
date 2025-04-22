@@ -196,16 +196,18 @@ const Chapter3: React.FC = () => {
   );
 
   return (
-    <div>
-      <h1>Welcome to Chapter 3!</h1>
+    <div className="screen-wrap">
+      <h1 className='chapter-title-color'>Welcome to Chapter 3!</h1>
 
-      <TypeAnimation
-        sequence={[
-            "The detective’s hand hovered over the cursed journal, but the sudden sound of footsteps froze him. Hooded cloaked figures emerged from the shadows with glowing eyes.",
-          1000,
-        ]}
-        speed={50}
-      />
+      <div className="intro-phrase-style chapter-p-color" style={{ minHeight: '100px', width: 'auto', margin: '0 auto', overflow: 'hidden' }}>
+        <TypeAnimation
+          sequence={[
+              "The detective’s hand hovered over the cursed journal, but the sudden sound of footsteps froze him. Hooded cloaked figures emerged from the shadows with glowing eyes.",
+            1000,
+          ]}
+          speed={50}
+        />
+      </div>
 
       <Modal
         isOpen={showModal}
@@ -352,8 +354,14 @@ const Chapter3: React.FC = () => {
         </div>
       </Modal>
 
+      <div className="card-order-container">
+
+      </div>
+
       {/* <div style={{ width: '500px', height: '400px', margin: '40px auto', overflow: 'hidden' }}> */}
-      <div style={{ width: '300px', height: '400px', margin: '40px auto', overflow: 'hidden' }}>
+
+      {/* <div style={{ width: '300px', height: '400px', margin: '40px auto', overflow: 'hidden' }}> */}
+      <div className='carousel-wrapper'>
         <AnimatedDiv {...bind()} style={{ touchAction: 'pan-y', cursor: 'grab', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <Carousel
           key={refreshCounter} // force remount when updated
@@ -367,48 +375,52 @@ const Chapter3: React.FC = () => {
 
       </div>
 
-      <button
-        onClick={() => {
-          currentArray.length = 0; // Clear the currentArray
-          arrayOrder.length = 0; // Clear the arrayOrder
-          
-          setCardImages([
-            { id: 1, name: 'Placeholder 1', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 2, name: 'Placeholder 2', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 3, name: 'Placeholder 3', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 4, name: 'Placeholder 4', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 5, name: 'Placeholder 5', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 6, name: 'Placeholder 6', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 7, name: 'Placeholder 7', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-            { id: 8, name: 'Placeholder 8', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
-          ]);
+      <div className='button-group' style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', justifyContent: 'center', transform: 'translateY(-125px)' }}>
+          <button
+            onClick={() => {
+              currentArray.length = 0; // Clear the currentArray
+              arrayOrder.length = 0; // Clear the arrayOrder
+              
+              setCardImages([
+                { id: 1, name: 'Placeholder 1', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+                { id: 2, name: 'Placeholder 2', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+                { id: 3, name: 'Placeholder 3', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+                { id: 4, name: 'Placeholder 4', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+                { id: 5, name: 'Placeholder 5', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+                { id: 6, name: 'Placeholder 6', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+                { id: 7, name: 'Placeholder 7', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+                { id: 8, name: 'Placeholder 8', image: '/projects/blackwood-mansion/assets/images/ch3.png', audio: 'Scan QR to update' },
+              ]);
 
-          alert('Order has been cleared!');
-        }}
-      >
-        Clear Order
-      </button>
+              alert('Order has been cleared!');
+            }}
+            className='spooky-btn'
+          >
+            Clear Order
+          </button>
 
-      <button
-        onClick={() => {
-          if (arrayOrder.length === cardData.length) {
-            checkOrder(arrayOrder, cardSetType);
-          } else {
-            alert(`Please click all cards first. : ${JSON.stringify(arrayOrder, null, 2)} \n` + 
-            `Please click all cards first. : ${JSON.stringify(getSetOrder(cardSetType), null, 2)} \n` + 
-            
-            `Please click all cards first. : ${cardSetType} \n`);
-          }
-          
-          // alert(`Please click all cards first. : ${JSON.stringify(jsonData, null, 2)}`);
-        }}
-      >
-        Check Order
-      </button>
+          <button
+            onClick={() => {
+              if (arrayOrder.length === cardData.length) {
+                checkOrder(arrayOrder, cardSetType);
+              } else {
+                alert(`Please click all cards first. : ${JSON.stringify(arrayOrder, null, 2)} \n` + 
+                `Please click all cards first. : ${JSON.stringify(getSetOrder(cardSetType), null, 2)} \n` + 
+                
+                `Please click all cards first. : ${cardSetType} \n`);
+              }
+              
+              // alert(`Please click all cards first. : ${JSON.stringify(jsonData, null, 2)}`);
+            }}
+            className='spooky-btn'
+          >
+            Check Order
+          </button>
 
-      <button onClick={goBackToMain}>Back to Main</button>
-      {/* <button onClick={goToChapter3}>Go to Chapter 3</button> */}
-    </div>
+          <button className='spooky-btn' onClick={goBackToMain}>Back to Main</button>
+          {/* <button onClick={goToChapter3}>Go to Chapter 3</button> */}
+        </div>
+      </div>
   );
 };
 

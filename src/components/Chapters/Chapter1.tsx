@@ -193,13 +193,13 @@ const Chapter1: React.FC = () => {
   );
 
   return (
-    <div>
-      <h1 style={{paddingTop: '20px'}}>Welcome to Chapter 1!</h1>
+    <div className="screen-wrap">
+      <h1 className='chapter-title-color'>Welcome to Chapter 1!</h1>
 
-      <div style={{ height: '150px', width: '360px', overflow: 'hidden' }}>
+      <div className="intro-phrase-style chapter-p-color" style={{ minHeight: '100px', width: 'auto', margin: '0 auto', overflow: 'hidden' }}>
         <TypeAnimation
           sequence={[
-        "It was a dark, stormy evening when the call came in. A nervous voice on the other end, trembling with something deeper than fear. The caretaker of Blackwood Mansion desperate for help. The house, passed down through generations, held more than memories. It held shadows. Secrets buried beneath its foundations. And now... something had begun to stir.",
+        "It was a dark, stormy evening when the call came in. A nervous voice on the other end, trembling with something deeper than fear. The caretaker of Blackwood Mansion desperate for help.",
         1000,
           ]}
           speed={50}
@@ -359,9 +359,9 @@ const Chapter1: React.FC = () => {
 
 
 
-      <div className="card-order-display">
-        <h2>Card Order</h2>
-        <div className="card-order-grid">
+      <div className="card-order-container">
+        <h2 className='chapter-title-color'>Card Order</h2>
+        <div className="card-order-flex">
           {cardImages.map((card, index) => (
         <div
           key={card.id}
@@ -394,19 +394,6 @@ const Chapter1: React.FC = () => {
 
       <style>
         {`
-          .card-order-display {
-        margin: 20px auto;
-        text-align: center;
-        scale: 0.8;
-transform: translateY(-47px);
-          }
-          .card-order-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-        grid-template-rows: repeat(2, auto);
-        gap: 10px;
-        margin-top: 10px;
-          }
           .card-order-item {
         border: 1px solid #ccc;
         border-radius: 5px;
@@ -425,7 +412,9 @@ transform: translateY(-47px);
         `}
       </style>
 
-      <div style={{ width: '300px', height: '400px', margin: '20px auto', overflow: 'hidden', transform: 'translateY(-120px)', position: 'relative' }}>
+      {/* <div style={{ width: '300px', height: '270px', margin: '10px auto', overflow: 'hidden', transform: 'translateY(-120px)', position: 'relative' }}> */}
+      <div className='carousel-wrapper'>
+
         <AnimatedDiv {...bind()} style={{ touchAction: 'pan-y', cursor: 'grab', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} data-testid="carousel-container">
           <Carousel
         key={refreshCounter} // force remount when updated
@@ -437,42 +426,45 @@ transform: translateY(-47px);
           />
         </AnimatedDiv>
         <button
+          className='carousel-nav left'
           onClick={() => setGoToSlide((prev) => (prev !== undefined ? Math.max(0, prev - 1) : 0))}
-          style={{
-        position: 'absolute',
-        top: '50%',
-        left: '10px',
-        transform: 'translateY(-50%)',
-        backgroundColor: '#4CAF50',
-        color: 'white',
-        border: 'none',
-        borderRadius: '50%',
-        width: '40px',
-        height: '40px',
-        cursor: 'pointer',
-          }}
+          // style={{
+          //   position: 'absolute',
+          //   top: '50%',
+          //   left: '10px',
+          //   transform: 'translateY(-50%)',
+          //   backgroundColor: '#4CAF50',
+          //   color: 'white',
+          //   border: 'none',
+          //   borderRadius: '50%',
+          //   width: '40px',
+          //   height: '40px',
+          //   cursor: 'pointer',
+          // }}
         >
           ◀
         </button>
         <button
+          className='carousel-nav right'
           onClick={() => setGoToSlide((prev) => (prev !== undefined ? Math.min(carouselSlides.length - 1, prev + 1) : 0))}
-          style={{
-        position: 'absolute',
-        top: '50%',
-        right: '10px',
-        transform: 'translateY(-50%)',
-        backgroundColor: '#4CAF50',
-        color: 'white',
-        border: 'none',
-        borderRadius: '50%',
-        width: '40px',
-        height: '40px',
-        cursor: 'pointer',
-          }}
+        //   style={{
+        // position: 'absolute',
+        // top: '50%',
+        // right: '10px',
+        // transform: 'translateY(-50%)',
+        // backgroundColor: '#4CAF50',
+        // color: 'white',
+        // border: 'none',
+        // borderRadius: '50%',
+        // width: '40px',
+        // height: '40px',
+        // cursor: 'pointer',
+        //   }}
         >
           ▶
         </button>
       </div>
+      {/* </div> */}
 
       <div className='button-group' style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', justifyContent: 'center', transform: 'translateY(-125px)' }}>
         <button
@@ -494,6 +486,7 @@ transform: translateY(-47px);
 
             alert('Order has been cleared!');
           }}
+          className='spooky-btn'
         >
           Clear Order
         </button>
@@ -511,12 +504,13 @@ transform: translateY(-47px);
             
             // alert(`Please click all cards first. : ${JSON.stringify(jsonData, null, 2)}`);
           }}
+          className='spooky-btn'
         >
           Check Order
         </button>
 
-        <button onClick={goBackToMain}>Back to Main</button>
-        <button onClick={goToChapter2}>Go to Chapter 2</button>
+        <button className='spooky-btn' onClick={goBackToMain}>Back to Main</button>
+        <button  className='spooky-btn' onClick={goToChapter2}>Go to Chapter 2</button>
       </div>
     </div>
   );
