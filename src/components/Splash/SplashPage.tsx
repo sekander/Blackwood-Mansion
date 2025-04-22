@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useEffect, useState } from 'react'
+import styled, { keyframes } from "styled-components";
 import { useScreenVisibility } from '../ScreenVisibilityContext';
 
 // === Animations ===
@@ -125,7 +125,7 @@ const HorrorTitle: React.FC<HorrorTitleProps> = ({ text, startDelay = 0 }) => {
   );
 };
 
-// === Splash Page ===
+
 export default function SplashPage() {
   const { handleScreen } = useScreenVisibility();
   const [showSecondLine, setShowSecondLine] = useState(false);

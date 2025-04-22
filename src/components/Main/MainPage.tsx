@@ -1,6 +1,17 @@
-import React, { useState } from "react";
+// import React from "react";
 import styled, { keyframes } from "styled-components";
 import { useScreenVisibility } from "../ScreenVisibilityContext";
+import { useState } from "react";
+    
+const StyledStudyBuddy = styled.span`
+  color: black;
+  font-size: 48px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  line-height: 47.29px;
+  word-wrap: break-word;
+`;
+
 
 // Animation for floating/flickering horror text
 const floatFlicker = keyframes`
@@ -102,26 +113,33 @@ const AccordionText = styled.p`
   color: #f0f0f0;
 `;
 
+
+// export const LoginPage = () => {
 export default function MainPage() {
-  const { screenVisibility, handleScreen } = useScreenVisibility();
+// State to hold the input value
+    const { screenVisibility, handleScreen } = useScreenVisibility();  // Get visibility state and handler from context
+      // State to control if content is visible or not
   const [isOpen, setIsOpen] = useState(false);
 
+  // Function to toggle the visibility
   const toggleAccordion = () => {
     setIsOpen(!isOpen);
   };
 
+
+  // Handler to switch to Chapter 1
   const goToChapter1 = () => {
+    // setCurrentScreen('chapter_1');
     handleScreen('chapter_1');
   };
 
+
+
   return (
     <MainPageLayout>
-      <FloatingTitle>Blackwood<br />Mansion</FloatingTitle>
-
-      {/* <InfoText>
-        Current Visible Screen: <br />
-        {Object.keys(screenVisibility).find(screen => screenVisibility[screen])}
-      </InfoText> */}
+        <div>
+                <FloatingTitle>Blackwood<br />Mansion</FloatingTitle>
+        </div>
 
       <ToggleButton onClick={toggleAccordion}>
         {isOpen ? 'Hide Instructions' : 'Show Instructions'}
@@ -134,6 +152,7 @@ export default function MainPage() {
       )}
 
       <StartButton onClick={goToChapter1}>START</StartButton>
+
     </MainPageLayout>
   );
-}
+};

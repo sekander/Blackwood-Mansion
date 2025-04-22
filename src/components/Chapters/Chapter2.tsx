@@ -1,196 +1,592 @@
-import { useState } from 'react';
-import { useScreenVisibility } from '../ScreenVisibilityContext';
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
 import { TypeAnimation } from 'react-type-animation';
-import { Cards } from '../Cards/Cards';
+import Modal from 'react-modal';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+import { useScreenVisibility } from '../ScreenVisibilityContext';
+import { useCardContext } from '../CardContext';
+import { useDrag } from '@use-gesture/react';
+import { animated } from '@react-spring/web';
 
+Modal.setAppElement('#root');
 
-interface Card {
-  id: number;
-  image: string;
-  name: string;
-  audio: string,
-  qrcode: string
-}
+// Container with fixed dimensions and background
+const SplashContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 400px;
+  height: 800px;
+  background-image: url("/projects/blackwood-mansion/assets/images/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+`;
 
-const cardData: Card[] = [
-  {
-    "id": 1,
-    "image": "/fall_object.webp",
-    "name": "Fallen Object",
-    "audio": "../../asset/audio/bones-scream.mp3",
-    "qrcode": ""
-  },
-  {
-    "id": 2,
-    "image": "/whisper_image.webp",
-    "name": "Suspicious Whispers",
-    "audio": "../../asset/audio/fart.mp3",
-    "qrcode": ""
-  },
-  {
-    "id": 3,
-    "image": "/bloody_knife.png",
-    "name": "Bloody Knife",
-    "audio": "../../asset/audio/fart.mp3",
-    "qrcode": ""
-  },
-  {
-    "id": 4,
-    "image": "/torn_curtain.png",
-    "name": "Torn Curtain",
-    "audio": "../../asset/audio/fart.mp3",
-    "qrcode": ""
-  },
-  {
-    "id": 5,
-    "image": "/locked_diary.png",
-    "name": "Locked Diary",
-    "audio": "../../asset/audio/fart.mp3",
-    "qrcode": ""
-  },
-];
+// Horror animations
+const flicker = keyframes`
+  0% { opacity: 0.8; }
+  5% { opacity: 0.5; }
+  10% { opacity: 0.6; }
+  15% { opacity: 0.85; }
+  25% { opacity: 0.5; }
+  30% { opacity: 1; }
+  35% { opacity: 0.4; }
+  40% { opacity: 0.8; }
+  50% { opacity: 0.6; }
+  65% { opacity: 0.8; }
+  75% { opacity: 0.5; }
+  85% { opacity: 0.9; }
+  100% { opacity: 0.7; }
+`;
 
+const pulse = keyframes`
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+`;
 
+const bloodDrip = keyframes`
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100vh; }
+`;
 
-export default function Chapter2() {
-  // State to manage which screen is visible
-  const { screenVisibility, handleScreen } = useScreenVisibility();
+// Overlay for horror effects
+const HorrorOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(10, 10, 10, 0.7);
+  animation: ${flicker} 5s infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  overflow: hidden;
 
-  const [clickOrder, setClickOrder] = useState<number[]>([]);
-  const [tempArr, setTempArr ] = useState([]);
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(139, 0, 0, 0.1) 0%,
+      transparent 10%,
+      transparent 90%,
+      rgba(139, 0, 0, 0.1) 100%
+    );
+    pointer-events: none;
+    animation: ${bloodDrip} 60s linear infinite;
+    background-size: 100% 200%;
+    z-index: 0;
+  }
+`;
 
+const HorrorTitle = styled.h1`
+  color: #ff4444;
+  text-shadow: 0 0 5px #8b0000, 0 0 10px #8b0000;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  position: relative;
+  text-align: center;
+  letter-spacing: 1px;
+  animation: ${pulse} 3s infinite;
+  z-index: 1;
+`;
 
-  const handleCardClick = (cardId: number) => {
-    // If card is already selected, remove it from the sequence
-    if (clickOrder.includes(cardId)) {
-      setClickOrder(prev => prev.filter(id => id !== cardId));
-    } 
-    // Otherwise add it to the sequence if we haven't reached the max (5)
-    else if (clickOrder.length < cardData.length) {
-      setClickOrder(prev => [...prev, cardId]);
-    }
-  };
+const CardsContainer = styled.div`
+  display: flex;
+  overflow-x: auto;
+  width: 100%;
+  padding: 20px 0;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+  cursor: grab;
+`;
 
-  const currentArray : number[] = []
+const Card = styled.div`
+  flex: 0 0 auto;
+  width: 180px;
+  height: 220px;
+  margin: 0 10px;
+  background-color: black;
+  border: 1px solid #8b0000;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(139, 0, 0, 0.7);
+  transform: rotate(${() => Math.random() > 0.5 ? '1deg' : '-1deg'});
+  transition: all 0.3s;
 
-  const handleTempArr = (card: Card) => {
-    if(currentArray.length < cardData.length ){
-      console.log("HandleTempArr")
-      console.log(card.id)
-  
-      if(!currentArray.includes(card.id)) {
-        currentArray.push(card.id)
-        console.log(currentArray)
-      } else {
-        console.log(`card ${card.id} is already in the array` )
-      }
-    }
-  };
+  &:hover {
+    border-color: #ff4444;
+    transform: scale(1.05) rotate(${() => Math.random() > 0.5 ? '1deg' : '-1deg'});
+  }
+`;
 
-
-  const checkOrder = (array: number[]) => {
-    const correctOrder = [2, 5, 3, 1, 4];
-    
-    let correctOder: Boolean = true;
-
-    for (let index = 0; index < array.length; index++) {
-      const element = array[index];
-      if( element == correctOrder[index]){
-        correctOder = true;
-      } else {
-        correctOder = false;
-      }
-    }
-    
-    if(correctOder) {
-      alert(`order is correct`)
-    } else {
-      alert("order is not correct")
-    }
-    // array.forEach((num: number) => {
-    //   if(array[num] === correctOrder[num]){
-    //     console.log("correct")
-    //   } else {
-    //     console.log("non-correct")
-    //   }
-    // }
-    // )
+const HorrorModal = styled(Modal)`
+  &.modal-content {
+    background-color: #1a1a1a;
+    border: 1px solid #8b0000;
+    border-radius: 0;
+    padding: 1.5rem;
+    width: 350px;
+    margin: auto;
+    color: #e0e0e0;
+    box-shadow: 0 0 20px #8b0000;
+    max-height: 80vh;
+    overflow-y: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1001;
   }
 
-  const getCardNumber = (cardId: number) => {
-    const index = clickOrder.indexOf(cardId);
-    return index >= 0 ? index + 1 : null;
+  &.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.8);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+`;
+
+const ScannerBox = styled.div`
+  width: 250px;
+  height: 250px;
+  border: 2px dashed #8b0000;
+  margin: 15px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+`;
+
+const ScannerText = styled.p`
+  color: #ff6666;
+  text-align: center;
+  margin: 10px 0;
+  text-shadow: 0 0 3px #8b0000;
+  font-size: 0.9rem;
+`;
+
+const HorrorButton = styled.button`
+  background-color: #330000;
+  color: #ff4444;
+  border: 1px solid #8b0000;
+  padding: 0.6rem 1.2rem;
+  margin: 0.3rem;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  font-size: 0.9rem;
+
+  &:hover {
+    background-color: #8b0000;
+    color: #fff;
+    text-shadow: 0 0 5px #fff;
+    box-shadow: 0 0 10px #ff4444;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 68, 68, 0.4),
+      transparent
+    );
+    transition: 0.5s;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+`;
+
+interface QrReaderProps {
+  delay: number;
+  style: CSSProperties;
+  onError: (err: any) => void;
+  onScan: (data: string | null) => void;
+}
+
+const QrReader: React.FC<QrReaderProps> = ({ delay, style, onError, onScan }) => {
+  const qrScannerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (qrScannerRef.current) {
+      const qrCodeScanner = new Html5QrcodeScanner(
+        qrScannerRef.current.id,
+        {
+          fps: 10,
+          qrbox: { width: 200, height: 200 },
+          aspectRatio: 1.0,
+        },
+        false
+      );
+    
+      qrCodeScanner.render(
+        (decodedText: string) => onScan(decodedText),
+        (error: string) => onError(error)
+      );
+    
+      return () => {
+        qrCodeScanner.clear().catch((err) => console.error('Error clearing QR scanner:', err));
+      };
+    }
+  }, [onScan, onError]);
+
+  return (
+    <div style={style}>
+      <div ref={qrScannerRef} id="qr-reader" style={{ width: '100%', height: '100%' }}></div>
+    </div>
+  );
+};
+
+const Chapter2: React.FC = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [scanData, setScanData] = useState<string>('Not Found');
+  const [jsonData, setJsonData] = useState<any>(null);
+  const [arrayOrder, setArrayOrder] = useState<number[]>([]); 
+  const [bloodSpatter, setBloodSpatter] = useState<Array<{x: number, y: number, size: number}>>([]);
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+
+  const [cardImages, setCardImages] = useState([
+    { id: 1, name: 'Haunted Mirror', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+    { id: 2, name: 'Cursed Doll', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+    { id: 3, name: 'Bloodstained Diary', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+    { id: 4, name: 'Witch\'s Pendant', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+    { id: 5, name: 'Phantom\'s Gloves', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+    { id: 6, name: 'Shadow Lantern', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+  ]);
+
+  const { handleScreen } = useScreenVisibility();
+  const {
+    cardData,
+    checkOrder,
+    getCardNumber,
+    currentArray,
+    cardSetType,
+    setCardSet,
+  } = useCardContext();
+
+  useEffect(() => {
+    setCardSet('set2');
+  }, []);
+
+  const [currentCardIndex, setCurrentCardIndex] = useState<number>(0);
+
+  // Blood spatter effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        setBloodSpatter(prev => [
+          ...prev,
+          {
+            x: Math.random() * 100,
+            y: Math.random() * 100,
+            size: Math.random() * 10 + 5
+          }
+        ]);
+      }
+      
+      if (bloodSpatter.length > 5) {
+        setBloodSpatter(prev => prev.slice(1));
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [bloodSpatter.length]);
+
+  useEffect(() => {
+    if (jsonData && jsonData.id) {
+      const matchedCard = cardData.find(card => card.id === jsonData.id);
+      if (matchedCard) {
+        setCardImages(prevCards =>
+          prevCards.map(card =>
+            card.id === jsonData.id
+              ? {
+                  ...card,
+                  name: jsonData.name ?? card.name,
+                  image: jsonData.image ?? card.image,
+                  audio: jsonData.audio ?? card.audio,
+                }
+              : card
+          )
+        );
+      }
+    }
+  }, [jsonData]);
+
+  const openModal = () => {
+    setShowModal(true);
+    const audio = new Audio('/projects/blackwood-mansion/assets/sounds/creaky-door.mp3');
+    audio.volume = 0.5;
+    audio.play().catch(e => console.error('Audio play failed:', e));
   };
 
-  const isOrderCorrect = () => {
-    // Replace with your desired correct order
-    const correctOrder = [2, 5, 3, 1, 4];
-    return JSON.stringify(clickOrder) === JSON.stringify(correctOrder);
+  const closeModal = () => {
+    setShowModal(false);
+    const audio = new Audio('/projects/blackwood-mansion/assets/sounds/ghost-whisper.mp3');
+    audio.volume = 0.3;
+    audio.play().catch(e => console.error('Audio play failed:', e));
   };
 
+  const goBackToMain = () => handleScreen('main');
+  const goToChapter3 = () => handleScreen('chapter_3');
 
-
-  // Handler to go back to MainPage
-  const goBackToMain = () => {
-    handleScreen('main');
+  const handleCardClick = (cardIndex: number) => {
+    setCurrentCardIndex(cardIndex);
+    openModal();
   };
-  
-  const goToChaper3 = () => {
-    handleScreen('chapter_3');
+
+  // Horizontal scrolling with cursor drag
+  const bind = useDrag(({ down, movement: [mx], direction: [xDir], velocity }) => {
+    if (down && cardsContainerRef.current) {
+      cardsContainerRef.current.scrollLeft -= mx * 2;
+    }
+  });
+
+  const playErrorSound = () => {
+    const audio = new Audio('/projects/blackwood-mansion/assets/sounds/error.mp3');
+    audio.volume = 0.5;
+    audio.play().catch(e => console.error('Audio play failed:', e));
+  };
+
+  const playSuccessSound = () => {
+    const audio = new Audio('/projects/blackwood-mansion/assets/sounds/success.mp3');
+    audio.volume = 0.5;
+    audio.play().catch(e => console.error('Audio play failed:', e));
   };
 
   return (
-    <div>
-        <div>
-
-          <h1>Welcome to Chapter 2!</h1>
-            <TypeAnimation 
-              sequence={[
-                "as the door opens detective Jones feels chills that makes the hairs on the back on his neck stand up. He makes the brave decision to walk in and what he finds will forever change the Blackwood Mansion."
-              ]}
-              speed={50}
-              // repeat={Infinity}
-            />
-
-
-
-      <div className="cards-grid">
-        {cardData.map((card) => (
+    <SplashContainer>
+      <HorrorOverlay>
+        {/* Blood spatter effects */}
+        {bloodSpatter.map((spatter, i) => (
           <div 
-            key={card.id}
-            // onClick={() => handleCardClick(card.id)}
-            onClick={() => handleTempArr(card)}
-            className={`card-wrapper ${getCardNumber(card.id) ? 'numbered' : ''}`}
-          >
-            <Cards 
-              image={card.image}
-              name={card.name}
-              qrcode={card.qrcode}
-              audio={card.audio}
-            />
-            {getCardNumber(card.id) && (
-              <div className="card-number">{getCardNumber(card.id)}</div>
-            )}
-          </div>
+            key={i}
+            style={{
+              position: 'absolute',
+              left: `${spatter.x}%`,
+              top: `${spatter.y}%`,
+              width: `${spatter.size}px`,
+              height: `${spatter.size}px`,
+              background: 'radial-gradient(circle, rgba(139,0,0,0.7) 0%, rgba(139,0,0,0) 70%)',
+              pointerEvents: 'none',
+              zIndex: 1
+            }}
+          />
         ))}
-      </div>
 
-             <button 
-              // onClick={goToChapter2} 
-              onClick={() => checkOrder(currentArray)} 
-              // disabled={!isOrderCorrect() || clickOrder.length !== cardData.length}
-            >Check Order</button>
+        <HorrorTitle>The Blackwood Mansion</HorrorTitle>
 
+        <TypeAnimation
+          sequence={[
+            "As the door opens, detective Jones feels chills that make the hairs on his neck stand up...",
+            1000,
+          ]}
+          speed={50}
+          style={{
+            color: '#ff6666',
+            fontSize: '0.9rem',
+            textAlign: 'center',
+            margin: '1rem 0',
+            lineHeight: '1.4',
+            textShadow: '0 0 3px #8b0000'
+          }}
+        />
 
-
-
-
-
-          <h2>Current Visible Screen: {Object.keys(screenVisibility).find(screen => screenVisibility[screen])}</h2>
-          <p>This is the first chapter of your journey.</p>
-          <button onClick={goBackToMain}>Back to Main</button>
-          <button onClick={goToChaper3}>Back to Chapter 3</button>
+        <div style={{ 
+          width: '100%',
+          position: 'relative',
+          margin: '1rem 0'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'url("/projects/blackwood-mansion/assets/images/cobweb.png") no-repeat center center',
+            backgroundSize: 'contain',
+            opacity: 0.2,
+            pointerEvents: 'none',
+            zIndex: 1
+          }} />
+          <CardsContainer 
+            ref={cardsContainerRef}
+            {...bind()}
+          >
+            {cardImages.map((card, index) => (
+              <Card key={card.id} onClick={() => handleCardClick(index)}>
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  style={{ 
+                    width: '140px',
+                    height: '140px',
+                    objectFit: 'contain',
+                    filter: 'sepia(50%) hue-rotate(300deg) brightness(0.8)'
+                  }}
+                />
+                <span style={{ 
+                  marginTop: '8px',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  color: '#ff4444'
+                }}>
+                  {getCardNumber(card.id)}
+                </span>
+                <p style={{ 
+                  color: '#ff8888',
+                  fontSize: '0.8rem',
+                  marginTop: '4px',
+                  textAlign: 'center'
+                }}>
+                  {card.name}
+                </p>
+              </Card>
+            ))}
+          </CardsContainer>
         </div>
-    </div>
-  )
-}
+
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          width: '100%',
+          marginTop: '1rem'
+        }}>
+          <HorrorButton
+            onClick={() => {
+              currentArray.length = 0;
+              arrayOrder.length = 0;
+              setCardImages([
+                { id: 1, name: 'Haunted Mirror', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+                { id: 2, name: 'Cursed Doll', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+                { id: 3, name: 'Bloodstained Diary', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+                { id: 4, name: 'Witch\'s Pendant', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+                { id: 5, name: 'Phantom\'s Gloves', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+                { id: 6, name: 'Shadow Lantern', image: '/projects/blackwood-mansion/assets/images/ch2.png', audio: 'Scan QR to update' },
+              ]);
+              playSuccessSound();
+            }}
+          >
+            Break The Curse
+          </HorrorButton>
+
+          <HorrorButton
+            onClick={() => {
+              if (arrayOrder.length === cardData.length) {
+                checkOrder(arrayOrder, cardSetType);
+                playSuccessSound();
+              } else {
+                playErrorSound();
+                alert(`The spirits demand all ${cardData.length} artifacts! You have only gathered ${arrayOrder.length}...`);
+              }
+            }}
+          >
+            Complete The Ritual
+          </HorrorButton>
+
+          <HorrorButton onClick={goBackToMain}>
+            Flee The Mansion
+          </HorrorButton>
+
+          <HorrorButton onClick={goToChapter3}>
+            Enter Chapter 3
+          </HorrorButton>
+        </div>
+
+        <HorrorModal
+          isOpen={showModal}
+          onRequestClose={closeModal}
+          contentLabel="QR Code Scanner"
+        >
+          <h2 style={{ 
+  color: '#ff4444', 
+  textAlign: 'center',
+  margin: '10rem 0 1rem',
+  fontSize: '1.4rem'
+}}>
+  🕷️ Cursed QR Scanner 🕷️
+</h2>
+
+          
+          <ScannerBox>
+            <QrReader
+              delay={300}
+              style={{ width: '100%', height: '100%' }}
+              onError={(err) => {
+                console.error('QR scan error', err);
+                playErrorSound();
+              }}
+              onScan={async (data: string | null) => {
+                if (data) {
+                  setScanData(data);
+                  try {
+                    const response = await fetch(data);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const json = await response.json();
+                    setJsonData(json);
+                    closeModal();
+                  } catch (error) {
+                    console.error('Fetch error:', error);
+                    setJsonData({ error: 'The spirits are blocking your connection...' });
+                    playErrorSound();
+                  }
+                }
+              }}
+            />
+          </ScannerBox>
+          
+          <ScannerText>Scanned Data: {scanData}</ScannerText>
+          
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center',
+            marginTop: '1rem'
+          }}>
+            <HorrorButton onClick={closeModal}>
+              Close Scanner
+            </HorrorButton>
+          </div>
+        </HorrorModal>
+      </HorrorOverlay>
+    </SplashContainer>
+  );
+};
+
+export default Chapter2;
