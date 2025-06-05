@@ -1,7 +1,3 @@
-Of course! Based on the provided code snippets, here is a project summary formatted as a Git README file.
-
----
-
 # Project: Blackwood Mansion - Interactive QR-Based Game
 
 This repository contains the source code for "Blackwood Mansion," an interactive, chapter-based web game that uses QR codes to drive the narrative and gameplay. The experience is built with React and TypeScript, creating an immersive and mysterious adventure for the player.
