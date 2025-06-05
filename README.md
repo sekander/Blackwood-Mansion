@@ -1,47 +1,50 @@
-# Getting Started with Create React App
+Of course! Based on the provided code snippets, here is a project summary formatted as a Git README file.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+---
 
-## Available Scripts
+# Project: Blackwood Mansion - Interactive QR-Based Game
 
-In the project directory, you can run:
+This repository contains the source code for "Blackwood Mansion," an interactive, chapter-based web game that uses QR codes to drive the narrative and gameplay. The experience is built with React and TypeScript, creating an immersive and mysterious adventure for the player.
 
-### `npm start`
+Players navigate through different chapters, each presenting a set of challenges. The core mechanic involves scanning physical QR codes to reveal story elements, audio clues, and images, which they must then place in the correct sequence to solve the chapter's puzzle.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Core Features
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+* **Chapter-Based Narrative:** The game is structured into multiple chapters, each with its own unique story, set of cards, and puzzle sequence.
+* **Interactive QR Code Scanning:** Utilizes the `html5-qrcode` library to enable players to scan QR codes using their device's camera. Each scan fetches data from a remote URL to update the game state.
+* **Dynamic Content Updates:** Scanning a QR code reveals associated card details, including an image, a name, and a crucial audio clip. This content dynamically updates the placeholder cards displayed on the screen.
+* **3D Card Carousel:** A visually engaging 3D carousel, powered by `react-spring-3d-carousel`, is used to display the interactive cards. Players can swipe or navigate through the cards.
+* **Sequence-Based Puzzles:** The primary objective in each chapter is to scan all the cards and arrange them in the correct order. The application validates the player's sequence against a predefined correct order.
+* **State Management with Context:** The application uses React's Context API (`CardContext`, `ScreenVisibilityContext`) to manage global state, including the current screen, card data, and the player's progress in the card sequence.
+* **Immersive Theming:** The UI is styled with `styled-components` to create a spooky, horror-themed atmosphere, complete with custom fonts, animations (`react-type-animation`, `keyframes`), and a fitting color palette.
+* **Responsive Modals:** Card details and the QR scanner are presented in clean, responsive modals (`react-modal`) for a seamless user experience.
 
-### `npm test`
+## How It Works
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1.  **Game Start:** The player begins at a main menu and starts the game, progressing to the first chapter.
+2.  **Card Interaction:** In each chapter, the player is presented with a carousel of placeholder cards.
+3.  **QR Scanning:** The player clicks a card to open a QR scanner modal. They must scan the corresponding physical QR code.
+4.  **Data Fetching:** Upon a successful scan, the application fetches JSON data from the URL encoded in the QR code.
+5.  **Unlocking Clues:** The fetched data updates the selected card with its true image and name. Simultaneously, an associated audio clue is played automatically.
+6.  **Building the Sequence:** A modal appears showing the card's details, offering the player an option to "Add to Sequence."
+7.  **Solving the Puzzle:** After all cards for the chapter have been scanned and added to the sequence, the player can submit their order.
+8.  **Validation:** The application checks if the player's sequence matches the correct order for that chapter and alerts the player to the result.
 
-### `npm run build`
+## Key Components
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* `Chapter[2|3].tsx`: The main component for each game chapter. It manages the state for the card carousel, the QR scanner modal, the fetched card data, and the user's sequence.
+* `MainPage.tsx`: The main menu or landing page for the application, which introduces the game and leads the player to the first chapter.
+* `ScreenVisibilityContext.tsx`: A React context provider that manages which screen or component is currently visible to the user (e.g., splash screen, main menu, or a specific chapter).
+* `CardContext.tsx`: A global state manager that holds the data for all card sets, the correct sequence for each puzzle, and the functions to validate the player's input.
+* `QrReader.tsx`: A reusable wrapper component for the `Html5QrcodeScanner` library, simplifying its integration into the chapter components.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Technologies Used
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* **Frontend:** React, TypeScript
+* **Styling:** `styled-components`
+* **Animation:** `react-spring-3d-carousel`, `react-type-animation`, `Framer Motion` (implied by `AnimatedDiv`)
+* **State Management:** React Context API
+* **QR Scanning:** `html5-qrcode`
+* **UI Components:** `react-modal`
+* **Gesture Handling:** `@use-gesture/react`
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-k
